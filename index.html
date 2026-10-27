@@ -72,6 +72,18 @@ input[type=range]{flex:1;min-width:0;accent-color:#fff}
 .chip:hover{border-color:var(--line2)}
 .dot{width:10px;height:10px;border-radius:50%}
 .note{padding:4px 16px 12px;font-size:11.5px;color:var(--muted)}
+.row.tg{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.row.tg>label{color:var(--text)}
+input.tgl{appearance:none;-webkit-appearance:none;flex:none;width:34px;height:20px;margin:0;border-radius:999px;background:rgba(255,255,255,.16);position:relative;cursor:pointer;transition:background .15s}
+input.tgl::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#bbb;transition:transform .15s,background .15s}
+input.tgl:checked{background:#fff}
+input.tgl:checked::after{transform:translateX(14px);background:#000}
+.psearch{position:sticky;top:0;z-index:2;padding:12px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+.looks{display:grid;gap:6px}
+.look{display:flex;align-items:center;gap:6px}
+.look span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sec.nomatch{display:none}
+.row.nomatch{display:none}
 textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical}
 
 /* toast */
@@ -98,7 +110,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 .tb-r{position:absolute;right:1em;display:flex;gap:.9em}
 
 /* layout */
-.pv-body{flex:1;min-height:0;display:grid;grid-template-columns:4.5em 15em 1fr}
+.pv-body{flex:1;min-height:0;display:grid}
 
 /* server rail */
 .rail{display:flex;flex-direction:column;align-items:center;gap:.5em;padding-top:.15em;overflow:hidden}
@@ -221,7 +233,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 .sys>.ic{color:var(--p-success)}
 .sys b{color:var(--p-text)}
 .sys time{font-size:.8em}
-.tbar{position:absolute;right:1em;top:-1em;display:flex;align-items:center;gap:.55em;padding:.3em .55em;border-radius:.5em;background:var(--p-popout);border:1px solid var(--p-border);color:var(--p-muted);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));animation:fade var(--p-speed) var(--p-ease) both;font-size:.95em}
+.tbar{position:absolute;right:1em;top:-1em;display:flex;align-items:center;gap:.55em;padding:.3em .55em;border-radius:.5em;background:var(--p-popout);border:1px solid var(--p-border);color:var(--p-muted);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));animation-name:var(--p-toolbar-anim,intox-fade);animation-duration:var(--p-speed);animation-timing-function:var(--p-ease);animation-fill-mode:both;font-size:.95em}
 .tbar i{width:1px;height:1em;background:rgba(255,255,255,.12)}
 .invite{margin-top:.4em;width:15em;border-radius:.5em;overflow:hidden;background:var(--p-card);border:1px solid rgba(255,255,255,.06)}
 .ib{height:3.2em;background:linear-gradient(135deg,#7a1f2b,#2a0d12)}
@@ -239,20 +251,20 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 .plbl{margin-top:.6em;font-size:.7em;font-weight:700}
 
 /* user panel (floats over the bottom of the rail and sidebar) */
-.upanel{position:absolute;left:.5em;bottom:.5em;width:18.5em;height:3.4em;display:flex;align-items:center;gap:.6em;padding:0 .7em;border-radius:.6em;background:var(--p-popout);border:1px solid var(--p-border);color:var(--p-muted)}
+.upanel{position:absolute;left:.5em;bottom:.5em;height:3.4em;display:flex;align-items:center;gap:.6em;padding:0 .7em;border-radius:.6em;background:var(--p-popout);border:1px solid var(--p-border);color:var(--p-muted)}
 .upanel .nm{color:var(--p-text)}
 
 /* overlays */
-.pv-menu{display:none;position:absolute;left:21%;top:22%;min-width:14em;padding:.4em;background:var(--p-popout);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));border:1px solid var(--p-border);border-radius:var(--p-radius);box-shadow:0 8px 30px rgba(0,0,0,.45);color:var(--p-text);transform-origin:top left;animation:rise var(--p-speed) var(--p-ease) both}
+.pv-menu{display:none;position:absolute;left:21%;top:22%;min-width:14em;padding:.4em;background:var(--p-popout);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));border:1px solid var(--p-border);border-radius:var(--p-radius);box-shadow:0 8px 30px rgba(0,0,0,.45);color:var(--p-text);transform-origin:top left;animation-name:var(--p-menu-anim,intox-rise);animation-duration:var(--p-speed);animation-timing-function:var(--p-ease);animation-fill-mode:both}
 .ov-menu .pv-menu{display:block}
 .mi{display:flex;align-items:center;justify-content:space-between;gap:1em;padding:.45em .6em;border-radius:calc(var(--p-radius) * .5);font-size:.9em;transition:background var(--p-speed) var(--p-ease)}
 .mi:hover{background:rgba(255,255,255,.08)}
 .mi .r{transform:rotate(-90deg)}
 .mi.danger{color:var(--p-danger)}
 .msep{height:1px;background:rgba(255,255,255,.08);margin:.3em .4em}
-.pv-wrap{display:none;position:absolute;inset:0;place-items:center;background:rgba(0,0,0,.55);animation:fade var(--p-speed) var(--p-ease) both}
+.pv-wrap{display:none;position:absolute;inset:0;place-items:center;background:rgba(0,0,0,.55);animation-name:var(--p-backdrop-anim,intox-fade);animation-duration:var(--p-speed);animation-timing-function:var(--p-ease);animation-fill-mode:both}
 .ov-window .pv-wrap{display:grid}
-.pv-modal{width:min(62%,34em);padding:1.5em;background:var(--p-modal);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));border:1px solid var(--p-border);border-radius:var(--p-radius);color:var(--p-text);animation:rise var(--p-speed) var(--p-ease) both}
+.pv-modal{width:min(62%,34em);padding:1.5em;background:var(--p-modal);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));border:1px solid var(--p-border);border-radius:var(--p-radius);color:var(--p-text);animation-name:var(--p-window-anim,none);animation-duration:var(--p-speed);animation-timing-function:var(--p-ease);animation-fill-mode:both}
 .pv-modal h4{margin:0 0 1em;font-size:1.3em}
 .mrow{display:flex;justify-content:space-between;align-items:center;padding:.7em 0;border-bottom:1px solid rgba(255,255,255,.06)}
 .sw{width:2.7em;height:1.5em;border-radius:1em;background:rgba(255,255,255,.18);position:relative;transition:background var(--p-speed) var(--p-ease)}
@@ -265,8 +277,38 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 .pb:hover{background:var(--p-hover)}
 .pb.ghost{background:rgba(255,255,255,.08)}
 .pb.red{background:var(--p-danger)}
-@keyframes rise{from{opacity:0;transform:translateY(4px) scale(.98)}to{opacity:1;transform:none}}
-@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes intox-rise{from{opacity:0;transform:translateY(4px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes intox-fade{from{opacity:0}to{opacity:1}}
+@keyframes intox-pop{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:none}}
+@keyframes intox-slide{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+@keyframes intox-drop{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+@keyframes intox-drift{from{transform:scale(1.06) translate(-1%,-1%)}to{transform:scale(1.06) translate(1%,1%)}}
+@keyframes intox-breathe{from{transform:scale(1)}to{transform:scale(1.04)}}
+/* messages and background (off unless chosen) */
+.msg{animation-name:var(--p-msg-anim,none);animation-duration:var(--p-speed);animation-timing-function:var(--p-ease);animation-fill-mode:both}
+.pv-bg{animation-name:var(--p-bg-anim,none);animation-duration:var(--p-bg-speed,40s);animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-direction:alternate}
+/* glows, matching the theme */
+.ch.unread{text-shadow:0 0 3px}
+.g::before{box-shadow:0 0 3px 1px var(--p-main)}
+.f-no-glow .ch.unread{text-shadow:none}
+.f-no-glow .g::before{box-shadow:none}
+/* hover switches */
+.g,.msg>.av{transition:transform var(--p-speed) var(--p-ease),border-radius var(--p-speed) var(--p-ease),background var(--p-speed) var(--p-ease)}
+.f-hover-servers .g:hover{transform:scale(1.06)}
+.f-hover-channels .ch:hover{padding-left:.85em}
+.f-hover-avatars .msg>.av:hover{transform:scale(1.06)}
+/* clean up switches */
+.f-hide-nitro .nav-nitro,.f-hide-shop .nav-shop,.f-hide-quests .nav-quests,.f-hide-active-now .rp.an{display:none}
+.f-hide-active-now .split.rp-wide.home-split{grid-template-columns:1fr}
+/* extras */
+.f-vignette .pv-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.65))}
+.f-selection .pv-app ::selection{background:color-mix(in srgb,var(--p-main) 45%,transparent)}
+/* server columns: home, separator and buttons span the full width so they stay centered */
+.pv-body{grid-template-columns:var(--p-railw,4.5em) 15em 1fr}
+.upanel{width:calc(var(--p-railw,4.5em) + 14em)}
+.pv.cols .rail{display:grid;grid-template-columns:repeat(var(--p-cols),3.5em);justify-content:center;justify-items:center;align-content:start;row-gap:.5em}
+.pv.cols .rail>:not([data-srv]){grid-column:1/-1}
+.pv.cols .g::before{left:-.5em}
 @container pv (max-width:700px){.split.rp-wide,.split.rp-mem{grid-template-columns:1fr}.split>.rp{display:none}.hsearch,.topic{display:none}}
 
 @media (max-width:900px){
@@ -276,7 +318,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
   #stageBody{flex:none;padding:12px}
   #panel{order:2;border-right:0;border-top:1px solid var(--line);overflow:visible}
 }
-@media (prefers-reduced-motion:reduce){*{transition-duration:0s!important}}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0s!important}.pv *,.pv-bg{animation:none!important}}
 </style>
 </head>
 <body>
@@ -393,6 +435,9 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
                 <div class="g" data-srv="Game Den" style="background:#3f7a5e">GD</div>
                 <div class="g" data-srv="Art Room" style="background:#7a6a3f">AR</div>
                 <div class="g" data-srv="Pixel Club" style="background:#4f3f7a">PX</div>
+                <div class="g" data-srv="Mix Lab" style="background:#3f6a7a">ML</div>
+                <div class="g" data-srv="Sketch Club" style="background:#7a4f3f">SC</div>
+                <div class="g" data-srv="Lo-fi Room" style="background:#5a3f7a">LR</div>
                 <div class="g act"><svg class="ic"><use href="#i-plus"/></svg></div>
                 <div class="g act"><svg class="ic"><use href="#i-compass"/></svg></div>
                 <div class="g act"><svg class="ic"><use href="#i-download"/></svg></div>
@@ -402,9 +447,9 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
                 <div class="side-in v-home v-dm">
                   <div class="find">Find or start a conversation</div>
                   <div class="nav sel-home" data-go="home"><svg class="ic"><use href="#i-friends"/></svg>Friends</div>
-                  <div class="nav"><svg class="ic"><use href="#i-nitro"/></svg>Nitro<span class="nbadge">NEW</span></div>
-                  <div class="nav"><svg class="ic"><use href="#i-shop"/></svg>Shop</div>
-                  <div class="nav"><svg class="ic"><use href="#i-quest"/></svg>Quests</div>
+                  <div class="nav nav-nitro"><svg class="ic"><use href="#i-nitro"/></svg>Nitro<span class="nbadge">NEW</span></div>
+                  <div class="nav nav-shop"><svg class="ic"><use href="#i-shop"/></svg>Shop</div>
+                  <div class="nav nav-quests"><svg class="ic"><use href="#i-quest"/></svg>Quests</div>
                   <div class="dmh">Direct Messages<svg class="ic"><use href="#i-plus"/></svg></div>
                   <div class="dmr" data-dm="nova"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div><div><div class="nm">Nova</div><div class="sub"><svg class="ic sm"><use href="#i-music"/></svg>Glass Avenue</div></div></div>
                   <div class="dmr cur" data-dm="kit"><div class="av" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div><div><div class="nm">Kit <span class="tag">INTX</span></div></div></div>
@@ -435,7 +480,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
                   <span class="tab-p on">Online</span><span class="tab-p">All</span><span class="btn-acc">Add Friend</span>
                   <span class="grow"></span><svg class="ic"><use href="#i-chat"/></svg>
                 </header>
-                <div class="split rp-wide">
+                <div class="split rp-wide home-split">
                   <div class="fl">
                     <div class="search"><svg class="ic sm"><use href="#i-search"/></svg>Search</div>
                     <div class="sublbl">Online - 3</div>
@@ -443,7 +488,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
                     <div class="fr" data-dm="kit"><div class="av" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div><div class="grow"><div class="nm">Kit <span class="tag">INTX</span></div><div class="sub">Idle</div></div><span class="cbtn"><svg class="ic sm"><use href="#i-chat"/></svg></span><span class="cbtn"><svg class="ic sm"><use href="#i-dots"/></svg></span></div>
                     <div class="fr" data-dm="mira"><div class="av" style="background:#c0563f">M<span class="st" data-st="dnd"></span></div><div class="grow"><div class="nm">Mira</div><div class="sub">brb, making tea</div></div><span class="cbtn"><svg class="ic sm"><use href="#i-chat"/></svg></span><span class="cbtn"><svg class="ic sm"><use href="#i-dots"/></svg></span></div>
                   </div>
-                  <aside class="rp">
+                  <aside class="rp an">
                     <h5>Active Now</h5>
                     <div class="anc" data-dm="nova">
                       <div class="anr"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div><div class="grow"><div class="nm">Nova</div><div class="sub">Listening to music</div></div><svg class="ic"><use href="#i-music"/></svg></div>

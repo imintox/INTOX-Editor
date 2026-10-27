@@ -54,6 +54,9 @@ const THEME_ITEMS = [
 ];
 THEME_ITEMS.forEach(i => { i.d = null; });
 
+const ANIMS = [['intox-rise', 'Rise'], ['intox-fade', 'Fade'], ['intox-pop', 'Pop'], ['intox-slide', 'Slide in'], ['intox-drop', 'Drop down'], ['none', 'None']];
+const BG_ANIMS = [['none', 'None'], ['intox-drift', 'Slow drift'], ['intox-breathe', 'Breathe']];
+const FEATURES = ['hover-servers', 'hover-channels', 'hover-avatars', 'hide-nitro', 'hide-shop', 'hide-quests', 'hide-active-now', 'no-glow', 'vignette', 'selection'];
 const SECTIONS = [
   { id: 'accent', title: 'Accent colors', open: true, items: [
     { k: '--main-color', label: 'Main color', t: 'color', d: '#4a6cf7' },
@@ -75,6 +78,9 @@ const SECTIONS = [
     { fk: 'contrast', label: 'Image contrast', t: 'range', min: 50, max: 200, step: 1, unit: '%', d: 100 }
   ] },
   { id: 'panels', theme: true, items: THEME_ITEMS },
+  { id: 'servers', title: 'Server list', items: [
+    { k: '--intox-server-columns', label: 'Server columns (experimental)', t: 'select', opts: [['1', '1 (normal)'], ['2', '2 columns'], ['3', '3 columns'], ['4', '4 columns']], d: '1', strict: 1 }
+  ] },
   { id: 'channels', title: 'Channel colors', items: [
     { k: '--channel-selected-bg', label: 'Selected channel background', t: 'rgba', d: 'rgba(255, 255, 255, 0.08)' },
     { k: '--channel-unread', label: 'Unread channel text', t: 'color', d: '#ffffff' },
@@ -87,6 +93,28 @@ const SECTIONS = [
     { k: '--intox-blur', label: 'Glass blur behind menus and windows', t: 'range', min: 0, max: 40, step: 1, unit: 'px', d: 14 },
     { k: '--intox-border', label: 'Menu and window outline', t: 'rgba', d: 'rgba(255, 255, 255, 0.07)' },
     { k: '--intox-scroll', label: 'Scrollbar color', t: 'rgba', d: 'rgba(255, 255, 255, 0.16)' }
+  ] },
+  { id: 'anim', title: 'Animations', items: [
+    { k: '--intox-menu-anim', label: 'Menus', t: 'select', opts: ANIMS, d: 'intox-rise', strict: 1 },
+    { k: '--intox-toolbar-anim', label: 'Message hover toolbar', t: 'select', opts: ANIMS, d: 'intox-fade', strict: 1 },
+    { k: '--intox-window-anim', label: 'Windows and settings', t: 'select', opts: ANIMS, d: 'none', strict: 1 },
+    { k: '--intox-message-anim', label: 'New messages', t: 'select', opts: ANIMS, d: 'none', strict: 1 },
+    { k: '--intox-bg-anim', label: 'Background motion', t: 'select', opts: BG_ANIMS, d: 'none', strict: 1 },
+    { k: '--intox-bg-speed', label: 'Background motion speed (seconds per loop)', t: 'range', min: 10, max: 120, step: 5, unit: 's', d: 40 },
+    { k: '--intox-hover-servers', label: 'Server icons grow on hover', t: 'toggle', d: '' },
+    { k: '--intox-hover-channels', label: 'Channel names slide on hover', t: 'toggle', d: '' },
+    { k: '--intox-hover-avatars', label: 'Chat avatars grow on hover', t: 'toggle', d: '' }
+  ] },
+  { id: 'clean', title: 'Clean up', items: [
+    { k: '--intox-hide-nitro', label: 'Hide the Nitro link', t: 'toggle', d: '' },
+    { k: '--intox-hide-shop', label: 'Hide the Shop link', t: 'toggle', d: '' },
+    { k: '--intox-hide-quests', label: 'Hide Quests and the quest banner', t: 'toggle', d: '' },
+    { k: '--intox-hide-active-now', label: 'Hide the Active Now column', t: 'toggle', d: '' },
+    { k: '--intox-no-glow', label: 'Remove glows on unread items', t: 'toggle', d: '' }
+  ] },
+  { id: 'extras2', title: 'Extras', items: [
+    { k: '--intox-vignette', label: 'Darker background edges (vignette)', t: 'toggle', d: '' },
+    { k: '--intox-selection', label: 'Accent-colored text selection', t: 'toggle', d: '' }
   ] },
   { id: 'status', title: 'Status colors', items: [
     { k: '--online-color', label: 'Online', t: 'color', d: '#43b581' },
@@ -119,7 +147,7 @@ let S = { root: freshRoot(), f: freshF(), theme: freshThemes(), cur: 'ash', rati
 try {
   const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
   if (saved) {
-    Object.keys(S.root).forEach(k => { if (saved.root && saved.root[k] != null) S.root[k] = saved.root[k]; });
+    Object.keys(S.root).forEach(k => { if (saved.root && ['string', 'number'].includes(typeof saved.root[k])) S.root[k] = saved.root[k]; });
     Object.keys(S.f).forEach(k => { if (saved.f && typeof saved.f[k] === 'number') S.f[k] = saved.f[k]; });
     Object.keys(S.theme).forEach(t => Object.keys(S.theme[t]).forEach(k => { if (saved.theme && saved.theme[t] && saved.theme[t][k] != null) S.theme[t][k] = saved.theme[t][k]; }));
     // Saved data is only trusted if it matches the known choices exactly.
@@ -299,6 +327,12 @@ function mkControl(item) {
     r.oninput = () => { const n = parseFloat(r.value); a.set(n); show(n); changed(item); };
     field = el('div', { class: 'field' }, r, out);
     controls.push({ item, set: v => { r.value = v; show(v); } });
+  } else if (item.t === 'toggle') {
+    const cb = el('input', { type: 'checkbox', id, class: 'tgl', role: 'switch' });
+    cb.onchange = () => { a.set(cb.checked ? 'on' : ''); changed(item); };
+    row.className = 'row tg';
+    field = cb;
+    controls.push({ item, set: v => { cb.checked = v === 'on'; } });
   } else if (item.t === 'select') {
     const s = el('select', { id }, item.opts.map(([v, l]) => el('option', { value: v }, l)));
     s.onchange = () => { a.set(s.value); changed(item); };
@@ -332,6 +366,9 @@ function mkControl(item) {
 let themeSummary;
 function buildPanel() {
   const p = $('#panel'); p.textContent = '';
+  const q = el('input', { type: 'search', placeholder: 'Search settings', 'aria-label': 'Search settings', spellcheck: 'false' });
+  q.oninput = () => filterPanel(q.value);
+  p.append(el('div', { class: 'psearch' }, q));
   SECTIONS.forEach(sec => {
     const sum = el('summary', {}, sec.theme ? '' : sec.title);
     const d = el('details', { class: 'sec' }, sum);
@@ -355,6 +392,17 @@ function buildPanel() {
         mk('No image (pure black)', () => { S.root['--background-image'] = 'none'; S.root['--background-fill'] = '#000000'; }));
       body.insertBefore(el('div', { class: 'row' }, info, fill, chips), body.children[1]);
     }
+    if (sec.id === 'anim') {
+      const play = el('button', { class: 'btn small', type: 'button' }, 'Play animations in the preview');
+      play.onclick = () => { if (S.scene === 'none' && S.root['--intox-menu-anim'] !== 'none') setOverlay('menu'); replay(); };
+      body.prepend(el('div', { class: 'hint' }, 'Animations always stay off when your system asks to reduce motion.'), play);
+    }
+    if (sec.id === 'servers') {
+      body.append(el('div', { class: 'hint' }, 'Home and the add and discover buttons stay centered above the columns. Experimental: if Discord changes its server list, set this back to 1.'));
+    }
+    if (sec.id === 'clean') {
+      body.prepend(el('div', { class: 'hint' }, 'These only hide things. Turn a switch off to bring it back.'));
+    }
     if (sec.theme) {
       themeSummary = sum;
       const b = el('button', { class: 'btn small', type: 'button' }, 'Copy these to all three dark themes');
@@ -368,7 +416,8 @@ function buildPanel() {
   const go = el('button', { class: 'btn small', type: 'button' }, 'Load into editor');
   go.onclick = () => { const n = importCSS(ta.value); toast(n ? `Loaded ${n} value${n === 1 ? '' : 's'}` : 'Nothing recognized'); };
   p.append(el('details', { class: 'sec' }, el('summary', {}, 'Import existing CSS'), el('div', { class: 'body' }, el('div', { class: 'hint' }, 'Paste CSS you already use and the editor will read the INTOX settings from it.'), ta, go)));
-  p.append(el('div', { class: 'note' }, 'Only values you change are written to the CSS output. INTOX 1.0.0'));
+  p.append(buildLooks());
+  p.append(el('div', { class: 'note' }, 'Only values you change are written to the CSS output. INTOX 1.1.0'));
 }
 
 function syncAll() {
@@ -419,6 +468,8 @@ function importCSS(css) {
       if (it.theme) { (tk ? [tk] : Object.keys(S.theme)).forEach(t => { S.theme[t][k] = cv; }); n++; }
       else if (it.t === 'range') { const x = parseFloat(v); if (!isNaN(x)) { S.root[k] = x; n++; } }
       else if (it.t === 'image') { S.root[k] = normImage(v); n++; }
+      else if (it.t === 'toggle') { S.root[k] = v.trim() === 'on' ? 'on' : ''; n++; }
+      else if (it.strict) { if (it.opts.some(([o]) => o === v.trim())) { S.root[k] = v.trim(); n++; } }
       else { S.root[k] = cv; n++; }
     }
   }
@@ -456,7 +507,14 @@ function render() {
   bg.style.filter = parts.length ? parts.join(' ') : 'none';
   const c = parseColor(t['--background-shading']) || { r: 0, g: 0, b: 0, a: 0.9 };
   $('#pvshade').style.background = `rgba(${c.r},${c.g},${c.b},${c.a * (+r['--background-shading-percent'] / 100)})`;
-  fr.className = `pv view-${S.view} ov-${S.scene}`;
+  const cols = Math.min(4, Math.max(1, parseInt(r['--intox-server-columns'], 10) || 1));
+  v('--p-cols', String(cols));
+  v('--p-railw', cols > 1 ? `calc(${cols} * 3.5em + 1em)` : '4.5em');
+  v('--p-menu-anim', r['--intox-menu-anim']); v('--p-toolbar-anim', r['--intox-toolbar-anim']);
+  v('--p-window-anim', r['--intox-window-anim']); v('--p-msg-anim', r['--intox-message-anim']);
+  v('--p-bg-anim', r['--intox-bg-anim']); v('--p-bg-speed', (+r['--intox-bg-speed'] || 40) + 's');
+  const feats = FEATURES.filter(f => S.root['--intox-' + f] === 'on').map(f => 'f-' + f);
+  fr.className = ['pv', 'view-' + S.view, 'ov-' + S.scene, cols > 1 ? 'cols' : '', ...feats].filter(Boolean).join(' ');
   const out = buildCSS();
   $('#out').value = out;
   $('#count').textContent = lastN ? `(${lastN})` : '';
@@ -465,7 +523,7 @@ function render() {
   w.textContent = lastWarn.length ? 'Left out because the value was not safe to write as CSS: ' + lastWarn.join(', ') + '. Remove any braces, semicolons, comments or unbalanced brackets.' : '';
 }
 function replay() {
-  const els = [$('#menu'), $('.pv-wrap'), $('.pv-modal'), ...$$('.tbar')];
+  const els = [$('#menu'), $('.pv-wrap'), $('.pv-modal'), ...$$('.tbar'), ...$$('#frame .msg')];
   els.forEach(x => { x.style.animation = 'none'; });
   void els[0].offsetWidth;
   els.forEach(x => { x.style.animation = ''; });
@@ -480,6 +538,85 @@ function fit() {
   let w = W, h = W * b / a;
   if (h > H) { h = H; w = H * a / b; }
   fr.style.width = Math.floor(w) + 'px'; fr.style.height = Math.floor(h) + 'px';
+}
+
+/* ---------- settings search ---------- */
+function filterPanel(text) {
+  const q = text.trim().toLowerCase();
+  $$('#panel details.sec').forEach(d => {
+    if (d.dataset.wasOpen === undefined) d.dataset.wasOpen = d.open ? '1' : '';
+    const title = (d.querySelector('summary') || {}).textContent || '';
+    const rows = $$('.body > .row', d);
+    let any = !q || title.toLowerCase().includes(q);
+    rows.forEach(r => {
+      const hit = !q || title.toLowerCase().includes(q) || r.textContent.toLowerCase().includes(q);
+      r.classList.toggle('nomatch', !hit);
+      if (hit) any = true;
+    });
+    d.classList.toggle('nomatch', !any);
+    if (q) d.open = any; else { d.open = d.dataset.wasOpen === '1'; delete d.dataset.wasOpen; }
+  });
+}
+
+/* ---------- saved looks (kept only in this browser) ---------- */
+const LOOKS_KEY = 'intox-editor-looks-v1';
+const MAX_LOOKS = 30;
+function loadLooks() {
+  try {
+    const a = JSON.parse(localStorage.getItem(LOOKS_KEY) || '[]');
+    if (!Array.isArray(a)) return [];
+    return a.filter(x => x && typeof x.name === 'string' && typeof x.data === 'string' && x.data.length < 100000)
+      .slice(0, MAX_LOOKS).map(x => ({ name: x.name.slice(0, 40), data: x.data }));
+  } catch (e) { return []; }
+}
+function saveLooks(list) { try { localStorage.setItem(LOOKS_KEY, JSON.stringify(list)); return true; } catch (e) { return false; } }
+// A look is applied by copying only known settings with plain values, the same way saved state is read.
+function applyLook(json) {
+  let v; try { v = JSON.parse(json); } catch (e) { return false; }
+  if (!v || typeof v !== 'object') return false;
+  settle();
+  const next = { root: freshRoot(), f: freshF(), theme: freshThemes() };
+  Object.keys(next.root).forEach(k => { if (v.root && has(v.root, k) && ['string', 'number'].includes(typeof v.root[k])) next.root[k] = v.root[k]; });
+  Object.keys(next.f).forEach(k => { if (v.f && typeof v.f[k] === 'number' && isFinite(v.f[k])) next.f[k] = v.f[k]; });
+  Object.keys(next.theme).forEach(t => Object.keys(next.theme[t]).forEach(k => { if (v.theme && v.theme[t] && typeof v.theme[t][k] === 'string') next.theme[t][k] = v.theme[t][k]; }));
+  S.root = next.root; S.f = next.f; S.theme = next.theme;
+  noteChange(); settle();
+  syncAll(); save(); render(); probeImage();
+  return true;
+}
+function buildLooks() {
+  const list = el('div', { class: 'looks' });
+  const name = el('input', { type: 'text', maxlength: '40', placeholder: 'Name this look', 'aria-label': 'Look name', spellcheck: 'false' });
+  const saveBtn = el('button', { class: 'btn small', type: 'button' }, 'Save current look');
+  const draw = () => {
+    list.textContent = '';
+    const looks = loadLooks();
+    if (!looks.length) { list.append(el('div', { class: 'hint' }, 'No saved looks yet.')); return; }
+    looks.forEach((lk, i) => {
+      const apply = el('button', { class: 'btn small', type: 'button' }, 'Apply');
+      const del = el('button', { class: 'btn small', type: 'button' }, 'Delete');
+      apply.onclick = () => { if (applyLook(lk.data)) toast('Applied "' + lk.name + '"'); };
+      let armed = false;
+      del.onclick = () => {
+        if (!armed) { armed = true; del.textContent = 'Confirm'; setTimeout(() => { armed = false; del.textContent = 'Delete'; }, 2500); return; }
+        const cur = loadLooks(); cur.splice(i, 1); saveLooks(cur); draw();
+      };
+      list.append(el('div', { class: 'look' }, el('span', { title: lk.name }, lk.name), apply, del));
+    });
+  };
+  saveBtn.onclick = () => {
+    const n = name.value.trim().slice(0, 40);
+    if (!n) { name.focus(); toast('Give the look a name first'); return; }
+    settle();
+    const cur = loadLooks().filter(x => x.name !== n);
+    if (cur.length >= MAX_LOOKS) { toast('You can keep up to ' + MAX_LOOKS + ' looks'); return; }
+    cur.unshift({ name: n, data: snap() });
+    toast(saveLooks(cur) ? 'Saved "' + n + '"' : 'Could not save (browser storage is off)');
+    name.value = ''; draw();
+  };
+  draw();
+  return el('details', { class: 'sec' }, el('summary', {}, 'Saved looks'),
+    el('div', { class: 'body' }, el('div', { class: 'hint' }, 'Looks are kept only in this browser.'), el('div', { class: 'line' }, name, saveBtn), list));
 }
 
 /* ---------- clickable preview ---------- */
@@ -647,6 +784,7 @@ $('#redo').onclick = redo;
 document.addEventListener('click', e => { if (e.target.closest && e.target.closest('button')) settle(); }, true);
 document.addEventListener('change', () => settle(), true);
 document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && S.scene !== 'none') { setOverlay('none'); return; }
   if (!(e.ctrlKey || e.metaKey) || e.altKey) return;
   const k = e.key.toLowerCase();
   if (k !== 'z' && k !== 'y') return;
