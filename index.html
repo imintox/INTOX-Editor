@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-gIozlu2iVgmGbeSGZpv4MVy88Gm8YkZEMTK3V/zWbZ4='; style-src 'unsafe-inline'; img-src https: data: blob:; connect-src 'none'; font-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INTOX Editor</title>
+<meta name="description" content="Customize the INTOX Discord theme with a live preview and copy the CSS into Vencord.">
+<style>
+:root{color-scheme:dark;--bg:#000;--panel:#08080a;--raise:#111115;--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.18);--text:#e8e8ec;--muted:#8e8e98;--accent:#4a6cf7;--warn:#e5a23a;--bad:#e5484d;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:13px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;overflow:hidden}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.mono{font-family:var(--mono);font-size:12px}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--bg)}
+.brand{display:flex;align-items:baseline;gap:8px;margin-right:6px}
+.logo{font-weight:700;letter-spacing:.22em;font-size:14px}
+.badge{font-size:10px;letter-spacing:.14em;color:var(--muted);border:1px solid var(--line2);padding:1px 6px;border-radius:4px}
+.top label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;white-space:nowrap}
+.spacer{flex:1}
+.btn{background:transparent;border:1px solid var(--line2);color:var(--text);padding:7px 12px;border-radius:7px;transition:background .15s,border-color .15s}
+.btn:hover{background:rgba(255,255,255,.07)}
+.btn.primary{background:#fff;color:#000;border-color:#fff;font-weight:600}
+.btn.primary:hover{background:#d9d9de}
+.btn.small{padding:4px 9px;font-size:12px}
+:focus-visible{outline:2px solid rgba(255,255,255,.55);outline-offset:1px}
+
+/* layout */
+.main{flex:1;min-height:0;display:grid;grid-template-columns:350px 1fr}
+#panel{overflow:auto;border-right:1px solid var(--line);background:var(--panel);padding-bottom:40px}
+.stage{display:flex;flex-direction:column;min-width:0;min-height:0}
+.tabs{display:flex;gap:2px;padding:0 16px;border-bottom:1px solid var(--line)}
+.tab{background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:11px 12px}
+.tab[aria-selected=true]{color:var(--text);border-bottom-color:#fff}
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:10px 16px;color:var(--muted);font-size:12px}
+.toolbar label{display:flex;align-items:center;gap:6px;white-space:nowrap}
+#stageBody{flex:1;min-height:0;display:grid;place-items:center;padding:16px}
+#cssView{flex:1;min-height:0;display:flex;flex-direction:column;padding:16px;gap:10px}
+#out{flex:1;width:100%;resize:none;background:var(--raise);border:1px solid var(--line);border-radius:8px;padding:14px;font-family:var(--mono);font-size:12.5px;line-height:1.6;color:#d6d6dc;white-space:pre;overflow:auto}
+[hidden]{display:none!important}
+
+/* sidebar sections */
+details.sec{border-bottom:1px solid var(--line)}
+details.sec>summary{list-style:none;cursor:pointer;padding:13px 16px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px;user-select:none}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary::before{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+details.sec[open]>summary::before{transform:rotate(45deg)}
+details.sec[open]>summary{color:var(--text)}
+.body{padding:2px 16px 16px;display:grid;gap:12px}
+.row{display:grid;gap:5px}
+.row>label{font-size:12px;color:var(--muted)}
+.field{display:flex;gap:8px;align-items:center}
+.field.stack{flex-direction:column;align-items:stretch;gap:6px}
+.line{display:flex;gap:8px;align-items:center}
+input[type=text],select,textarea{background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:7px 9px;width:100%;min-width:0}
+input[type=text]:focus,select:focus,textarea:focus{border-color:var(--line2);outline:none}
+input.bad{border-color:var(--bad)}
+input[type=color]{width:34px;height:30px;padding:2px;border:1px solid var(--line);border-radius:6px;background:var(--raise);flex:none;cursor:pointer}
+input[type=range]{flex:1;min-width:0;accent-color:#fff}
+.val{min-width:46px;text-align:right;color:var(--muted)}
+.hint{font-size:11.5px;color:var(--muted)}
+.hint.warn{color:var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--raise);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:12px}
+.chip:hover{border-color:var(--line2)}
+.dot{width:10px;height:10px;border-radius:50%}
+.note{padding:4px 16px 12px;font-size:11.5px;color:var(--muted)}
+textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical}
+
+/* toast */
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,12px);background:#fff;color:#000;padding:8px 14px;border-radius:999px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:10}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ===== preview (a small mock of Discord, driven by the editor values) ===== */
+.pv{position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--line2);container-name:pv;container-type:inline-size;background:#000;font-family:var(--p-font);color:var(--p-text);filter:var(--p-filter,none)}
+.pv-fill,.pv-bg,.pv-shade{position:absolute;inset:0}
+.pv-app{position:absolute;inset:0;display:grid;grid-template-columns:4.8em 14.5em 1fr 13.5em;font-size:clamp(7px,1.25cqw,15px);line-height:1.4}
+.pv-guilds{display:flex;flex-direction:column;align-items:center;gap:.7em;padding:.8em 0}
+.g{position:relative;width:3.1em;height:3.1em;border-radius:50%;background:var(--p-card);display:grid;place-items:center;font-weight:700;color:var(--p-muted);transition:border-radius var(--p-speed) var(--p-ease),background var(--p-speed) var(--p-ease)}
+.g:hover{border-radius:1em;background:rgba(255,255,255,.1)}
+.g.sel{background:var(--p-main);color:#fff;border-radius:1em}
+.g.sel::before{content:"";position:absolute;left:-.9em;width:.3em;height:1.7em;background:#fff;border-radius:0 .3em .3em 0}
+.pv-channels{display:flex;flex-direction:column;background:var(--p-card);padding-top:.2em}
+.pv-ch-head{padding:.9em .9em;font-weight:700;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:.4em}
+.cat{font-size:.78em;text-transform:uppercase;letter-spacing:.07em;color:var(--p-muted);margin:.9em .9em .3em}
+.ch{display:flex;gap:.45em;align-items:center;padding:.42em .7em;margin:0 .45em;border-radius:.4em;color:var(--p-muted);transition:background var(--p-speed) var(--p-ease),color var(--p-speed) var(--p-ease)}
+.ch::before{content:"#";opacity:.7}
+.ch:hover{background:rgba(255,255,255,.05);color:var(--p-text)}
+.ch.sel{background:var(--p-sel);color:#fff}
+.ch.unread{color:var(--p-unread);font-weight:600}
+.ch.muted{opacity:.45}
+.pv-user{margin-top:auto;display:flex;align-items:center;gap:.6em;padding:.7em .8em;border-top:1px solid rgba(255,255,255,.06)}
+.av{position:relative;flex:none;width:2.5em;height:2.5em;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.95em;color:#fff}
+.st{position:absolute;right:-.1em;bottom:-.1em;width:.85em;height:.85em;border-radius:50%;border:.18em solid #0b0b0d}
+.pv-chat{display:flex;flex-direction:column;min-width:0}
+.pv-top{display:flex;align-items:center;gap:.5em;height:3.3em;padding:0 1.1em;font-weight:700;border-bottom:1px solid rgba(255,255,255,.06)}
+.pv-top span{color:var(--p-muted);font-weight:400}
+.msgs{flex:1;padding:.8em 1.1em;display:flex;flex-direction:column;gap:.55em;overflow:hidden}
+.msg{display:flex;gap:.8em;padding:.35em .5em;border-radius:.3em;transition:background var(--p-speed) var(--p-ease)}
+.msg:hover{background:rgba(255,255,255,.025)}
+.msg b{font-weight:600}
+.msg time{font-size:.78em;color:var(--p-muted);margin-left:.5em}
+.msg.ment{background:color-mix(in srgb,var(--p-main) 12%,transparent);box-shadow:inset .2em 0 var(--p-main)}
+.msg a{color:var(--p-main);text-decoration:none}
+.msg .men{background:color-mix(in srgb,var(--p-main) 28%,transparent);color:#fff;border-radius:.25em;padding:0 .25em}
+.code{margin-top:.35em;display:inline-block;background:var(--p-input);border-radius:.35em;padding:.4em .7em;font-family:var(--p-code);font-size:.92em}
+.pv-input{margin:.4em 1.1em 1em;padding:.8em 1em;background:var(--p-input);border-radius:var(--p-radius);color:var(--p-muted);transition:box-shadow var(--p-speed) var(--p-ease)}
+.pv-input:hover{box-shadow:0 0 0 1px rgba(255,255,255,.16)}
+.pv-members{padding:.9em .7em;background:var(--p-card)}
+.mem-h{font-size:.78em;text-transform:uppercase;letter-spacing:.07em;color:var(--p-muted);margin:.5em .5em .4em}
+.mem{display:flex;align-items:center;gap:.65em;padding:.32em .5em;border-radius:.4em;transition:background var(--p-speed) var(--p-ease)}
+.mem:hover{background:rgba(255,255,255,.05)}
+.mem.off{opacity:.5}
+.pv-menu{display:none;position:absolute;left:34%;top:34%;min-width:15em;padding:.4em;background:var(--p-popout);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));border:1px solid var(--p-border);border-radius:var(--p-radius);font-size:clamp(7px,1.25cqw,15px);box-shadow:0 8px 30px rgba(0,0,0,.4);transform-origin:top left;animation:rise var(--p-speed) var(--p-ease) both}
+.scene-menu .pv-menu{display:block}
+.mi{padding:.5em .8em;border-radius:calc(var(--p-radius) * .5);transition:background var(--p-speed) var(--p-ease)}
+.mi:hover{background:rgba(255,255,255,.08)}
+.mi.danger{color:var(--p-danger)}
+.msep{height:1px;background:rgba(255,255,255,.08);margin:.35em .4em}
+.pv-wrap{display:none;position:absolute;inset:0;place-items:center;background:rgba(0,0,0,.55);animation:fade var(--p-speed) var(--p-ease) both}
+.scene-window .pv-wrap{display:grid}
+.pv-modal{width:min(62%,34em);padding:1.5em;background:var(--p-modal);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));border:1px solid var(--p-border);border-radius:var(--p-radius);font-size:clamp(7px,1.25cqw,15px);animation:rise var(--p-speed) var(--p-ease) both}
+.pv-modal h4{margin:0 0 1em;font-size:1.3em}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:.7em 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.sw{width:2.7em;height:1.5em;border-radius:1em;background:rgba(255,255,255,.18);position:relative;transition:background var(--p-speed) var(--p-ease)}
+.sw::after{content:"";position:absolute;top:.2em;left:.2em;width:1.1em;height:1.1em;border-radius:50%;background:#fff;transition:transform var(--p-speed) var(--p-ease)}
+.sw.on{background:var(--p-main)}
+.sw.on::after{transform:translateX(1.2em)}
+.minput{margin-top:1em;padding:.7em .9em;background:var(--p-input);border-radius:calc(var(--p-radius) * .6);color:var(--p-muted)}
+.mbtns{display:flex;gap:.6em;margin-top:1.2em;justify-content:flex-end}
+.pb{padding:.55em 1.1em;border-radius:calc(var(--p-radius) * .6);color:#fff;font-weight:600;background:var(--p-main);transition:background var(--p-speed) var(--p-ease)}
+.pb:hover{background:var(--p-hover)}
+.pb.ghost{background:rgba(255,255,255,.08)}
+.pb.red{background:var(--p-danger)}
+.pb.green{background:var(--p-success)}
+@keyframes rise{from{opacity:0;transform:translateY(4px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@container pv (max-width:560px){.pv-members{display:none}.pv-app{grid-template-columns:4.4em 1fr}.pv-channels{display:none}}
+@container pv (min-width:561px) and (max-width:760px){.pv-members{display:none}.pv-app{grid-template-columns:4.8em 14.5em 1fr}}
+
+@media (max-width:900px){
+  body{overflow:auto;height:auto}
+  .main{grid-template-columns:1fr;grid-template-rows:auto auto}
+  .stage{order:1;height:auto}
+  #stageBody{flex:none;padding:12px}
+  #panel{order:2;border-right:0;border-top:1px solid var(--line);overflow:visible}
+}
+@media (prefers-reduced-motion:reduce){*{transition-duration:0s!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo">INTOX</span><span class="badge">EDITOR</span></div>
+  <label>Discord theme
+    <select id="theme" aria-label="Discord theme to edit">
+      <option value="ash">Ash (Dark)</option>
+      <option value="dark">Dark</option>
+      <option value="onyx">Onyx</option>
+    </select>
+  </label>
+  <div class="spacer"></div>
+  <button class="btn" id="reset">Reset</button>
+  <button class="btn" id="copy">Copy CSS</button>
+  <button class="btn primary" id="download">Download CSS</button>
+</header>
+
+<div class="main">
+  <aside id="panel" aria-label="Settings"></aside>
+  <section class="stage">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tabPreview" aria-selected="true">Preview</button>
+      <button class="tab" role="tab" id="tabCss" aria-selected="false">CSS output <span id="count" class="mono"></span></button>
+    </div>
+    <div id="previewView" style="display:flex;flex-direction:column;flex:1;min-height:0">
+      <div class="toolbar">
+        <label>Window shape
+          <select id="ratio" aria-label="Preview window shape">
+            <option value="16/9">Wide 16:9</option>
+            <option value="21/9">Ultrawide 21:9</option>
+            <option value="16/10">Laptop 16:10</option>
+            <option value="4/3">Small 4:3</option>
+            <option value="1/1">Square 1:1</option>
+          </select>
+        </label>
+        <label>Show
+          <select id="scene" aria-label="Preview scene">
+            <option value="menu">Chat and menu</option>
+            <option value="chat">Chat only</option>
+            <option value="window">Settings window</option>
+          </select>
+        </label>
+        <span>Try different window shapes to see how the background fits.</span>
+      </div>
+      <div id="stageBody">
+        <div class="pv scene-menu" id="frame">
+          <div class="pv-fill" id="pvfill"></div>
+          <div class="pv-bg" id="pvbg"></div>
+          <div class="pv-shade" id="pvshade"></div>
+          <div class="pv-app">
+            <nav class="pv-guilds" aria-hidden="true">
+              <div class="g sel">IN</div><div class="g">GD</div><div class="g">BD</div><div class="g">+</div>
+            </nav>
+            <div class="pv-channels" aria-hidden="true">
+              <div class="pv-ch-head">INTOX</div>
+              <div class="cat">Information</div>
+              <div class="ch">rules</div>
+              <div class="ch unread">announcements</div>
+              <div class="cat">Text</div>
+              <div class="ch sel">general</div>
+              <div class="ch">showcase</div>
+              <div class="ch muted">off-topic</div>
+              <div class="pv-user"><div class="av" style="background:#5865a0">Y<span class="st" data-st="online"></span></div><div><b>you</b><div class="hint" style="color:var(--p-muted);font-size:.85em">online</div></div></div>
+            </div>
+            <main class="pv-chat" aria-hidden="true">
+              <div class="pv-top">#&nbsp;general <span>Talk about anything</span></div>
+              <div class="msgs">
+                <div class="msg"><div class="av" style="background:#7a5cc0">N</div><div><b>Nova</b><time>Today 12:04</time><div>Just switched to INTOX. The black looks perfect.</div></div></div>
+                <div class="msg"><div class="av" style="background:#3f8f7a">K</div><div><b>Kit</b><time>Today 12:05</time><div>Same. Try the <a>accent presets</a> in the editor.</div></div></div>
+                <div class="msg ment"><div class="av" style="background:#c0563f">M</div><div><b>Mira</b><time>Today 12:06</time><div><span class="men">@you</span> the new build is live.</div><div class="code">--main-color: #4a6cf7;</div></div></div>
+              </div>
+              <div class="pv-input">Message #general</div>
+            </main>
+            <aside class="pv-members" aria-hidden="true">
+              <div class="mem-h">Online - 4</div>
+              <div class="mem"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div>Nova</div>
+              <div class="mem"><div class="av" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div>Kit</div>
+              <div class="mem"><div class="av" style="background:#c0563f">M<span class="st" data-st="dnd"></span></div>Mira</div>
+              <div class="mem"><div class="av" style="background:#4f6fb0">J<span class="st" data-st="streaming"></span></div>Juno</div>
+              <div class="mem-h">Offline - 1</div>
+              <div class="mem off"><div class="av" style="background:#555">R<span class="st" data-st="offline"></span></div>Rex</div>
+            </aside>
+          </div>
+          <div class="pv-menu" id="menu" aria-hidden="true">
+            <div class="mi">Mark as read</div>
+            <div class="mi">Mute channel</div>
+            <div class="mi">Notification settings</div>
+            <div class="msep"></div>
+            <div class="mi">Copy link</div>
+            <div class="mi danger">Delete channel</div>
+          </div>
+          <div class="pv-wrap" aria-hidden="true">
+            <div class="pv-modal">
+              <h4>Appearance</h4>
+              <div class="mrow"><span>Compact mode</span><span class="sw on"></span></div>
+              <div class="mrow"><span>Reduce motion</span><span class="sw"></span></div>
+              <div class="minput">Display name</div>
+              <div class="mbtns"><span class="pb ghost">Cancel</span><span class="pb red">Reset</span><span class="pb">Save changes</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="cssView" hidden>
+      <div class="hint">Paste this into Vencord: Settings, Vencord, Themes, Edit QuickCSS (at the bottom). INTOX must be enabled.</div>
+      <div class="hint warn" id="warn" hidden></div>
+      <textarea id="out" readonly spellcheck="false" aria-label="Generated CSS"></textarea>
+    </div>
+  </section>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const el = (t, a = {}, ...c) => {
+  const e = document.createElement(t);
+  for (const [k, v] of Object.entries(a)) {
+    if (k === 'class') e.className = v;
+    else if (v !== false && v != null) e.setAttribute(k, v === true ? '' : v);
+  }
+  c.flat().forEach(x => e.append(x && x.nodeType ? x : document.createTextNode(x == null ? '' : x)));
+  return e;
+};
+
+/* ---------- colour helpers ---------- */
+const hex6 = h => {
+  h = String(h).trim().toLowerCase();
+  if (/^#[0-9a-f]{3}$/.test(h)) h = '#' + [...h.slice(1)].map(c => c + c).join('');
+  return /^#[0-9a-f]{6}$/.test(h) ? h : null;
+};
+const parseColor = v => {
+  v = String(v == null ? '' : v).trim().toLowerCase();
+  let m; const h = hex6(v);
+  if (h) return { r: parseInt(h.slice(1, 3), 16), g: parseInt(h.slice(3, 5), 16), b: parseInt(h.slice(5, 7), 16), a: 1 };
+  if ((m = /^#([0-9a-f]{8})$/.exec(v))) { const n = m[1]; return { r: parseInt(n.slice(0, 2), 16), g: parseInt(n.slice(2, 4), 16), b: parseInt(n.slice(4, 6), 16), a: +(parseInt(n.slice(6, 8), 16) / 255).toFixed(2) }; }
+  if ((m = /^rgba?\(\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*(?:[,/]\s*([\d.]+)(%?))?\s*\)$/.exec(v))) {
+    let a = m[4] === undefined ? 1 : parseFloat(m[4]); if (m[5]) a /= 100;
+    return { r: +m[1], g: +m[2], b: +m[3], a: Math.min(1, Math.max(0, a)) };
+  }
+  return null;
+};
+const toRgba = c => `rgba(${c.r}, ${c.g}, ${c.b}, ${+c.a.toFixed(2)})`;
+const toHex = c => '#' + [c.r, c.g, c.b].map(n => Math.max(0, Math.min(255, n)).toString(16).padStart(2, '0')).join('');
+
+/* ---------- settings model ---------- */
+const FIT = [['contain', 'Contain: whole image always visible'], ['cover', 'Cover: fills the window, edges crop'], ['auto', 'Original size'], ['100% 100%', 'Stretch (distorts the image)']];
+const POS = ['center', 'top', 'bottom', 'left', 'right', 'top left', 'top right', 'bottom left', 'bottom right'].map(x => [x, x]);
+const EASE = [['cubic-bezier(0.2, 0, 0, 1)', 'Smooth (default)'], ['ease-in-out', 'Ease in-out'], ['linear', 'Linear'], ['cubic-bezier(0.34, 1.56, 0.64, 1)', 'Springy']];
+
+const THEMES = {
+  ash: { label: 'Ash (Dark)', sel: ':is(.theme-dark, .theme-light .theme-dark)', d: { '--background-shading': 'rgba(0, 0, 0, 0.86)', '--card-shading': 'rgba(255, 255, 255, 0.03)', '--popout-shading': 'rgba(10, 10, 12, 0.94)', '--modal-shading': 'rgba(8, 8, 10, 0.92)', '--input-shading': 'rgba(255, 255, 255, 0.05)', '--normal-text': '#e4e4e8', '--muted-text': '#8e8e98' } },
+  dark: { label: 'Dark', sel: ':is(.theme-darker, .theme-light .theme-darker)', d: { '--background-shading': 'rgba(0, 0, 0, 0.92)', '--card-shading': 'rgba(255, 255, 255, 0.03)', '--popout-shading': 'rgba(6, 6, 8, 0.95)', '--modal-shading': 'rgba(6, 6, 8, 0.94)', '--input-shading': 'rgba(255, 255, 255, 0.05)', '--normal-text': '#f0f0f3', '--muted-text': '#80808a' } },
+  onyx: { label: 'Onyx', sel: ':is(.theme-midnight, .theme-light .theme-midnight)', d: { '--background-shading': 'rgba(0, 0, 0, 0.97)', '--card-shading': 'rgba(255, 255, 255, 0.02)', '--popout-shading': 'rgba(0, 0, 0, 0.96)', '--modal-shading': 'rgba(0, 0, 0, 0.96)', '--input-shading': 'rgba(255, 255, 255, 0.05)', '--normal-text': '#f4f4f6', '--muted-text': '#787882' } }
+};
+const THEME_ITEMS = [
+  { k: '--background-shading', label: 'App tint over the background', t: 'rgba', theme: 1 },
+  { k: '--card-shading', label: 'Cards and side panels', t: 'rgba', theme: 1 },
+  { k: '--popout-shading', label: 'Popouts and menus', t: 'rgba', theme: 1 },
+  { k: '--modal-shading', label: 'Windows and settings', t: 'rgba', theme: 1 },
+  { k: '--input-shading', label: 'Inputs', t: 'rgba', theme: 1 },
+  { k: '--normal-text', label: 'Text color', t: 'color', theme: 1 },
+  { k: '--muted-text', label: 'Muted text color', t: 'color', theme: 1 }
+];
+THEME_ITEMS.forEach(i => { i.d = null; });
+
+const SECTIONS = [
+  { id: 'accent', title: 'Accent colors', open: true, items: [
+    { k: '--main-color', label: 'Main color', t: 'color', d: '#4a6cf7' },
+    { k: '--hover-color', label: 'Hover color', t: 'color', d: '#3a56d4' },
+    { k: '--success-color', label: 'Success color', t: 'color', d: '#43b581' },
+    { k: '--danger-color', label: 'Danger color', t: 'color', d: '#982929' },
+    { k: '--saturation-factor', label: 'Color saturation (everything)', t: 'range', min: 0, max: 2, step: 0.05, unit: '', d: 1 }
+  ] },
+  { id: 'bg', title: 'App background', open: true, items: [
+    { k: '--background-image', label: 'Image link or gradient', t: 'image', d: 'url(https://files.catbox.moe/9pvwts.png)' },
+    { k: '--background-size', label: 'Fit', t: 'select', opts: FIT, d: 'contain' },
+    { k: '--background-position', label: 'Position', t: 'select', opts: POS, d: 'center' },
+    { k: '--background-attachment', label: 'Attachment', t: 'select', opts: [['fixed', 'Fixed (stays put)'], ['scroll', 'Scroll']], d: 'fixed' },
+    { k: '--background-fill', label: 'Fill color (shown where the image does not reach)', t: 'color', d: '#000000' },
+    { k: '--background-shading-percent', label: 'Shading amount', t: 'range', min: 0, max: 100, step: 1, unit: '%', d: 100 },
+    { fk: 'blur', label: 'Image blur', t: 'range', min: 0, max: 20, step: 0.5, unit: 'px', d: 0 },
+    { fk: 'bright', label: 'Image brightness', t: 'range', min: 20, max: 200, step: 1, unit: '%', d: 100 },
+    { fk: 'sat', label: 'Image saturation', t: 'range', min: 0, max: 200, step: 1, unit: '%', d: 100 },
+    { fk: 'contrast', label: 'Image contrast', t: 'range', min: 50, max: 200, step: 1, unit: '%', d: 100 }
+  ] },
+  { id: 'panels', theme: true, items: THEME_ITEMS },
+  { id: 'channels', title: 'Channel colors', items: [
+    { k: '--channel-selected-bg', label: 'Selected channel background', t: 'rgba', d: 'rgba(255, 255, 255, 0.08)' },
+    { k: '--channel-unread', label: 'Unread channel text', t: 'color', d: '#ffffff' },
+    { k: '--channel-unread-hover', label: 'Unread channel hover text', t: 'color', d: '#ffffff' }
+  ] },
+  { id: 'motion', title: 'Motion and look', items: [
+    { k: '--intox-speed', label: 'Animation speed (0 turns animations off)', t: 'range', min: 0, max: 500, step: 10, unit: 'ms', d: 160 },
+    { k: '--intox-ease', label: 'Animation feel', t: 'select', opts: EASE, d: 'cubic-bezier(0.2, 0, 0, 1)' },
+    { k: '--intox-radius', label: 'Roundness of menus and windows', t: 'range', min: 0, max: 28, step: 1, unit: 'px', d: 12 },
+    { k: '--intox-blur', label: 'Glass blur behind menus and windows', t: 'range', min: 0, max: 40, step: 1, unit: 'px', d: 14 },
+    { k: '--intox-border', label: 'Menu and window outline', t: 'rgba', d: 'rgba(255, 255, 255, 0.07)' },
+    { k: '--intox-scroll', label: 'Scrollbar color', t: 'rgba', d: 'rgba(255, 255, 255, 0.16)' }
+  ] },
+  { id: 'status', title: 'Status colors', items: [
+    { k: '--online-color', label: 'Online', t: 'color', d: '#43b581' },
+    { k: '--idle-color', label: 'Idle', t: 'color', d: '#faa61a' },
+    { k: '--dnd-color', label: 'Do not disturb', t: 'color', d: '#982929' },
+    { k: '--streaming-color', label: 'Streaming', t: 'color', d: '#593695' },
+    { k: '--offline-color', label: 'Offline', t: 'color', d: '#808080' }
+  ] },
+  { id: 'profile', title: 'Profile card backgrounds', items: [
+    { k: '--user-popout-size', label: 'Profile popout fit', t: 'select', opts: [['cover', 'Cover'], ['contain', 'Contain']], d: 'cover' },
+    { k: '--user-modal-size', label: 'Profile window fit', t: 'select', opts: [['cover', 'Cover'], ['contain', 'Contain']], d: 'cover' }
+  ] },
+  { id: 'extras', title: 'Fonts and home icon', items: [
+    { k: '--main-font', label: 'Main font (leave empty for the theme default)', t: 'text', d: '', ph: '"gg sans", "Segoe UI", sans-serif', list: ['"gg sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif', 'Inter, "Segoe UI", system-ui, sans-serif', '"Segoe UI", system-ui, sans-serif', 'Arial, Helvetica, sans-serif', 'Georgia, serif', 'ui-monospace, Consolas, monospace'] },
+    { k: '--code-font', label: 'Code font', t: 'text', d: '', ph: 'Consolas, "Liberation Mono", monospace', list: ['Consolas, "Liberation Mono", Menlo, monospace', '"Cascadia Code", Consolas, monospace', '"JetBrains Mono", Consolas, monospace', 'ui-monospace, monospace'] },
+    { k: '--home-icon', label: 'Home button icon (image link, leave empty for default)', t: 'image', d: '' }
+  ] }
+];
+const ACCENTS = [['Blue', '#4a6cf7', '#3a56d4'], ['Mono', '#8a8a96', '#6f6f7a'], ['Red', '#e5484d', '#c93a3f'], ['Green', '#30a46c', '#268a59'], ['Violet', '#8b5cf6', '#7340e0'], ['Amber', '#e09f1f', '#bd8317']];
+
+const allItems = () => SECTIONS.flatMap(s => s.items);
+const freshRoot = () => { const o = {}; allItems().forEach(i => { if (i.k && !i.theme) o[i.k] = i.d; }); return o; };
+const freshF = () => { const o = {}; allItems().forEach(i => { if (i.fk) o[i.fk] = i.d; }); return o; };
+const freshThemes = () => ({ ash: { ...THEMES.ash.d }, dark: { ...THEMES.dark.d }, onyx: { ...THEMES.onyx.d } });
+const RATIOS = ['16/9', '21/9', '16/10', '4/3', '1/1'];
+const SCENES = ['menu', 'chat', 'window'];
+const KEY = 'intox-editor-v1';
+let S = { root: freshRoot(), f: freshF(), theme: freshThemes(), cur: 'ash', ratio: '16/9', scene: 'menu' };
+try {
+  const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
+  if (saved) {
+    Object.keys(S.root).forEach(k => { if (saved.root && saved.root[k] != null) S.root[k] = saved.root[k]; });
+    Object.keys(S.f).forEach(k => { if (saved.f && typeof saved.f[k] === 'number') S.f[k] = saved.f[k]; });
+    Object.keys(S.theme).forEach(t => Object.keys(S.theme[t]).forEach(k => { if (saved.theme && saved.theme[t] && saved.theme[t][k] != null) S.theme[t][k] = saved.theme[t][k]; }));
+    // Saved data is only trusted if it matches the known choices exactly.
+    if (Object.prototype.hasOwnProperty.call(THEMES, saved.cur)) S.cur = saved.cur;
+    if (RATIOS.includes(saved.ratio)) S.ratio = saved.ratio;
+    if (SCENES.includes(saved.scene)) S.scene = saved.scene;
+  }
+} catch (e) { /* storage may be unavailable */ }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignore */ } };
+
+/* ---------- value helpers ---------- */
+const normImage = v => {
+  v = String(v).trim();
+  if (!v) return '';
+  if (v === 'none' || /^url\(/i.test(v) || /-gradient\(/i.test(v)) return v;
+  return /[()\s'"\\]/.test(v) ? `url("${v.replace(/\\/g, '%5C').replace(/"/g, '%22')}")` : `url(${v})`;
+};
+// Output safety: a value may not be able to end its own line or block, start a comment,
+// pull in another stylesheet, or leave a bracket/quote open. Anything that does is left out.
+const isSafeValue = v => {
+  v = String(v);
+  if (/[\r\n\u2028\u2029{}]|\/\*|\*\/|@import|<\/?style|expression\(|javascript:/i.test(v)) return false;
+  let q = '', depth = 0;
+  for (const ch of v) {
+    if (q) { if (ch === q) q = ''; continue; }
+    if (ch === '"' || ch === "'") { q = ch; continue; }
+    if (ch === '(') depth++;
+    else if (ch === ')') { depth--; if (depth < 0) return false; }
+    else if (ch === ';' && depth === 0) return false;
+  }
+  return !q && depth === 0;
+};
+const normFor = (item, v) => {
+  if (item.t === 'color') { const c = parseColor(v); return c ? toHex(c) : String(v); }
+  if (item.t === 'rgba') { const c = parseColor(v); return c ? toRgba(c) : String(v); }
+  if (item.t === 'range') return +v;
+  return String(v).replace(/\s+/g, ' ').trim();
+};
+const fmt = (item, v) => item.t === 'range' ? `${+v}${item.unit || ''}` : v;
+const defaultFor = item => item.theme ? THEMES[S.cur].d[item.k] : item.d;
+
+/* ---------- build CSS output ---------- */
+let lastN = 0, lastWarn = [];
+function buildCSS() {
+  const warn = [];
+  // One place that writes a declaration, so every value passes the safety check.
+  const emit = (k, v) => {
+    if (!isSafeValue(v)) { warn.push(k); return null; }
+    return `  ${k}: ${v};`;
+  };
+  const rootLines = [];
+  SECTIONS.forEach(sec => {
+    if (sec.theme) return;
+    sec.items.forEach(i => {
+      if (!i.k) return;
+      const v = S.root[i.k];
+      if (v === '' || v == null) return;
+      if (normFor(i, v) !== normFor(i, i.d)) { const l = emit(i.k, fmt(i, v)); if (l) rootLines.push(l); }
+    });
+  });
+  const F = S.f, D = freshF();
+  if (Object.keys(F).some(k => F[k] !== D[k])) {
+    const parts = [];
+    if (F.blur !== D.blur) parts.push(`blur(${+F.blur}px)`);
+    if (F.bright !== D.bright) parts.push(`brightness(${+F.bright}%)`);
+    if (F.sat !== D.sat) parts.push(`saturate(${+F.sat}%)`);
+    if (F.contrast !== D.contrast) parts.push(`contrast(${+F.contrast}%)`);
+    const l = emit('--background-filter', parts.join(' ')); if (l) rootLines.push(l);
+  }
+  const blocks = [];
+  if (rootLines.length) blocks.push(`:root {\n${rootLines.join('\n')}\n}`);
+  let n = rootLines.length;
+  Object.keys(THEMES).forEach(tk => {
+    const lines = [];
+    THEME_ITEMS.forEach(i => {
+      const v = S.theme[tk][i.k];
+      if (normFor(i, v) !== normFor(i, THEMES[tk].d[i.k])) { const l = emit(i.k, v); if (l) lines.push(l); }
+    });
+    if (lines.length) { blocks.push(`${THEMES[tk].sel} {\n${lines.join('\n')}\n}`); n += lines.length; }
+  });
+  const head = '/* INTOX custom settings (made with the INTOX editor) */';
+  lastN = n; lastWarn = [...new Set(warn)];
+  return blocks.length ? `${head}\n\n${blocks.join('\n\n')}\n` : `${head}\n\n/* No changes yet. This matches the default INTOX look. */\n`;
+}
+
+/* ---------- controls ---------- */
+let uid = 0;
+const controls = [];
+const acc = item => {
+  const o = () => item.theme ? S.theme[S.cur] : item.fk ? S.f : S.root;
+  const key = item.k || item.fk;
+  return { get: () => o()[key], set: v => { o()[key] = v; } };
+};
+const changed = item => {
+  save(); render();
+  if (item && item.k && item.k.startsWith('--intox')) replay();
+};
+
+function mkControl(item) {
+  const id = 'c' + (uid++), a = acc(item);
+  const row = el('div', { class: 'row' }, el('label', { for: id }, item.label));
+  let field;
+  if (item.t === 'color') {
+    const pick = el('input', { type: 'color', id });
+    const txt = el('input', { type: 'text', class: 'mono', spellcheck: 'false', maxlength: '9', 'aria-label': item.label + ' hex' });
+    pick.oninput = () => { txt.value = pick.value; txt.classList.remove('bad'); a.set(pick.value); changed(item); };
+    txt.oninput = () => {
+      const c = parseColor(txt.value);
+      if (!c) { txt.classList.add('bad'); return; }
+      txt.classList.remove('bad'); pick.value = toHex(c); a.set(txt.value.trim()); changed(item);
+    };
+    field = el('div', { class: 'field' }, pick, txt);
+    controls.push({ item, set: v => { const c = parseColor(v); pick.value = c ? toHex(c) : '#000000'; txt.value = v; txt.classList.remove('bad'); } });
+  } else if (item.t === 'rgba') {
+    const pick = el('input', { type: 'color', id });
+    const txt = el('input', { type: 'text', class: 'mono', spellcheck: 'false', 'aria-label': item.label + ' value' });
+    const al = el('input', { type: 'range', min: 0, max: 1, step: 0.01, 'aria-label': item.label + ' opacity' });
+    const out = el('span', { class: 'val mono' });
+    const pct = c => Math.round(c.a * 100) + '%';
+    const fromParts = () => {
+      const c = parseColor(pick.value); c.a = +al.value;
+      const s = toRgba(c); txt.value = s; out.textContent = pct(c); txt.classList.remove('bad'); a.set(s); changed(item);
+    };
+    pick.oninput = fromParts; al.oninput = fromParts;
+    txt.oninput = () => {
+      const c = parseColor(txt.value);
+      if (!c) { txt.classList.add('bad'); return; }
+      txt.classList.remove('bad'); pick.value = toHex(c); al.value = c.a; out.textContent = pct(c); a.set(toRgba(c)); changed(item);
+    };
+    field = el('div', { class: 'field stack' }, el('div', { class: 'line' }, pick, txt), el('div', { class: 'line' }, al, out));
+    controls.push({ item, set: v => { const c = parseColor(v) || { r: 0, g: 0, b: 0, a: 1 }; pick.value = toHex(c); al.value = c.a; txt.value = toRgba(c); out.textContent = pct(c); txt.classList.remove('bad'); } });
+  } else if (item.t === 'range') {
+    const r = el('input', { type: 'range', id, min: item.min, max: item.max, step: item.step || 1 });
+    const out = el('span', { class: 'val mono' });
+    const show = v => { out.textContent = (+v) + (item.unit || ''); };
+    r.oninput = () => { const n = parseFloat(r.value); a.set(n); show(n); changed(item); };
+    field = el('div', { class: 'field' }, r, out);
+    controls.push({ item, set: v => { r.value = v; show(v); } });
+  } else if (item.t === 'select') {
+    const s = el('select', { id }, item.opts.map(([v, l]) => el('option', { value: v }, l)));
+    s.onchange = () => { a.set(s.value); changed(item); };
+    field = el('div', { class: 'field' }, s);
+    controls.push({ item, set: v => { s.value = v; } });
+  } else if (item.t === 'image') {
+    const inp = el('input', { type: 'text', id, class: 'mono', spellcheck: 'false', placeholder: item.d === '' ? 'Theme default' : 'https://... or linear-gradient(...)' });
+    inp.oninput = () => {
+      const n = normImage(inp.value);
+      a.set(n === '' ? (item.d === '' ? '' : 'none') : n);
+      inp.classList.toggle('bad', !isSafeValue(n));
+      changed(item);
+      if (item.k === '--background-image') probeImage();
+    };
+    field = el('div', { class: 'field' }, inp);
+    controls.push({ item, set: v => { inp.value = v; } });
+  } else {
+    const inp = el('input', { type: 'text', id, class: 'mono', spellcheck: 'false', placeholder: item.ph || '' });
+    if (item.list) {
+      const dl = el('datalist', { id: id + 'l' }, item.list.map(v => el('option', { value: v })));
+      inp.setAttribute('list', id + 'l'); row.append(dl);
+    }
+    inp.oninput = () => { a.set(inp.value.trim()); inp.classList.toggle('bad', !isSafeValue(inp.value)); changed(item); };
+    field = el('div', { class: 'field' }, inp);
+    controls.push({ item, set: v => { inp.value = v; } });
+  }
+  row.append(field);
+  return row;
+}
+
+let themeSummary;
+function buildPanel() {
+  const p = $('#panel'); p.textContent = '';
+  SECTIONS.forEach(sec => {
+    const sum = el('summary', {}, sec.theme ? '' : sec.title);
+    const d = el('details', { class: 'sec' }, sum);
+    if (sec.open || sec.theme) d.open = true;
+    const body = el('div', { class: 'body' });
+    sec.items.forEach(i => body.append(mkControl(i)));
+    if (sec.id === 'accent') {
+      const chips = el('div', { class: 'chips' }, ACCENTS.map(([n, m, h]) =>
+        el('button', { class: 'chip', type: 'button' }, el('span', { class: 'dot', style: `background:${m}` }), n)));
+      $$('button', chips).forEach((b, i) => { b.onclick = () => { S.root['--main-color'] = ACCENTS[i][1]; S.root['--hover-color'] = ACCENTS[i][2]; syncAll(); changed(); }; });
+      body.prepend(el('div', { class: 'row' }, el('label', {}, 'Quick accents'), chips));
+    }
+    if (sec.id === 'bg') {
+      const info = el('div', { class: 'hint', id: 'imgInfo' });
+      const fill = el('button', { class: 'btn small', type: 'button', id: 'fillBtn', hidden: true });
+      fill.onclick = () => { S.root['--background-fill'] = fill.dataset.hex; syncAll(); changed(); toast('Fill color matched'); };
+      const mk = (label, fn) => { const b = el('button', { class: 'chip', type: 'button' }, label); b.onclick = () => { fn(); syncAll(); changed(); probeImage(); }; return b; };
+      const chips = el('div', { class: 'chips' },
+        mk('Fit whole image', () => { S.root['--background-size'] = 'contain'; S.root['--background-position'] = 'center'; }),
+        mk('Fill window', () => { S.root['--background-size'] = 'cover'; S.root['--background-position'] = 'center'; }),
+        mk('No image (pure black)', () => { S.root['--background-image'] = 'none'; S.root['--background-fill'] = '#000000'; }));
+      body.insertBefore(el('div', { class: 'row' }, info, fill, chips), body.children[1]);
+    }
+    if (sec.theme) {
+      themeSummary = sum;
+      const b = el('button', { class: 'btn small', type: 'button' }, 'Copy these to all three dark themes');
+      b.onclick = () => { const cur = S.theme[S.cur]; Object.keys(S.theme).forEach(t => { S.theme[t] = { ...cur }; }); changed(); toast('Copied to all dark themes'); };
+      body.prepend(el('div', { class: 'hint' }, 'Pick the same theme in Discord under Settings, Appearance.'));
+      body.append(b);
+    }
+    d.append(body); p.append(d);
+  });
+  const ta = el('textarea', { class: 'imp', spellcheck: 'false', placeholder: ':root {\n  --main-color: #e5484d;\n}', 'aria-label': 'CSS to import' });
+  const go = el('button', { class: 'btn small', type: 'button' }, 'Load into editor');
+  go.onclick = () => { const n = importCSS(ta.value); toast(n ? `Loaded ${n} value${n === 1 ? '' : 's'}` : 'Nothing recognized'); };
+  p.append(el('details', { class: 'sec' }, el('summary', {}, 'Import existing CSS'), el('div', { class: 'body' }, el('div', { class: 'hint' }, 'Paste CSS you already use and the editor will read the INTOX settings from it.'), ta, go)));
+  p.append(el('div', { class: 'note' }, 'Only values you change are written to the CSS output. INTOX 1.0.0'));
+}
+
+function syncAll() {
+  controls.forEach(({ item, set }) => {
+    const v = item.theme ? S.theme[S.cur][item.k] : item.fk ? S.f[item.fk] : S.root[item.k];
+    set(v);
+  });
+  if (themeSummary) themeSummary.textContent = 'Panels and text: ' + THEMES[S.cur].label;
+  $('#theme').value = S.cur; $('#ratio').value = S.ratio; $('#scene').value = S.scene;
+}
+
+/* ---------- import ---------- */
+// Split "a: b; c: d" on semicolons, ignoring any inside quotes or brackets (e.g. data: links).
+function splitDecls(body) {
+  const out = []; let cur = '', depth = 0, q = '';
+  for (const ch of body) {
+    if (q) { cur += ch; if (ch === q) q = ''; continue; }
+    if (ch === '"' || ch === "'") { q = ch; cur += ch; continue; }
+    if (ch === '(') depth++;
+    if (ch === ')') depth = Math.max(0, depth - 1);
+    if (ch === ';' && depth === 0) { out.push(cur); cur = ''; continue; }
+    cur += ch;
+  }
+  if (cur.trim()) out.push(cur);
+  return out;
+}
+function importCSS(css) {
+  css = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  const items = {}; allItems().forEach(i => { if (i.k) items[i.k] = i; });
+  THEME_ITEMS.forEach(i => { items[i.k] = i; });
+  let n = 0, m; const re = /([^{}]+)\{([^{}]*)\}/g;
+  while ((m = re.exec(css))) {
+    const sel = m[1];
+    const tk = /theme-midnight/.test(sel) ? 'onyx' : /theme-darker/.test(sel) ? 'dark' : /theme-dark/.test(sel) ? 'ash' : null;
+    for (const piece of splitDecls(m[2])) {
+      const d = /^\s*(--[\w-]+)\s*:\s*([\s\S]+?)\s*$/.exec(piece);
+      if (!d) continue;
+      const k = d[1], v = d[2], it = items[k];
+      if (k === '--background-filter') {
+        const g = (re2) => { const x = re2.exec(v); return x ? parseFloat(x[1]) : null; };
+        const b = g(/blur\(([\d.]+)px\)/), br = g(/brightness\(([\d.]+)%\)/), sa = g(/saturate\(([\d.]+)%\)/), co = g(/contrast\(([\d.]+)%\)/);
+        if (b != null) S.f.blur = b; if (br != null) S.f.bright = br; if (sa != null) S.f.sat = sa; if (co != null) S.f.contrast = co;
+        n++; continue;
+      }
+      if (!it) continue;
+      const cv = it.t === 'rgba' ? (parseColor(v) ? toRgba(parseColor(v)) : v) : v;
+      if (it.theme) { (tk ? [tk] : Object.keys(S.theme)).forEach(t => { S.theme[t][k] = cv; }); n++; }
+      else if (it.t === 'range') { const x = parseFloat(v); if (!isNaN(x)) { S.root[k] = x; n++; } }
+      else if (it.t === 'image') { S.root[k] = normImage(v); n++; }
+      else { S.root[k] = cv; n++; }
+    }
+  }
+  syncAll(); save(); render(); probeImage();
+  return n;
+}
+
+/* ---------- preview ---------- */
+function render() {
+  const fr = $('#frame'), r = S.root, t = S.theme[S.cur], F = S.f, D = freshF();
+  const v = (k, val) => fr.style.setProperty(k, val);
+  v('--p-main', r['--main-color']); v('--p-hover', r['--hover-color']); v('--p-success', r['--success-color']); v('--p-danger', r['--danger-color']);
+  v('--p-card', t['--card-shading']); v('--p-popout', t['--popout-shading']); v('--p-modal', t['--modal-shading']); v('--p-input', t['--input-shading']);
+  v('--p-text', t['--normal-text']); v('--p-muted', t['--muted-text']);
+  v('--p-sel', r['--channel-selected-bg']); v('--p-unread', r['--channel-unread']);
+  v('--p-speed', r['--intox-speed'] + 'ms'); v('--p-ease', r['--intox-ease']); v('--p-radius', r['--intox-radius'] + 'px');
+  v('--p-blur', r['--intox-blur'] + 'px'); v('--p-border', r['--intox-border']);
+  v('--p-font', r['--main-font'] || '"gg sans","Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif');
+  v('--p-code', r['--code-font'] || 'Consolas,"Liberation Mono",Menlo,monospace');
+  v('--p-filter', +r['--saturation-factor'] !== 1 ? `saturate(${r['--saturation-factor']})` : 'none');
+  $$('.st', fr).forEach(s => { s.style.background = r['--' + s.dataset.st + '-color']; });
+  $('#pvfill').style.background = r['--background-fill'];
+  const bg = $('#pvbg');
+  bg.style.backgroundImage = r['--background-image'] || 'none';
+  bg.style.backgroundPosition = r['--background-position'];
+  bg.style.backgroundSize = r['--background-size'];
+  bg.style.backgroundRepeat = 'no-repeat';
+  const parts = [];
+  if (F.blur !== D.blur) parts.push(`blur(${F.blur}px)`);
+  if (F.bright !== D.bright) parts.push(`brightness(${F.bright}%)`);
+  if (F.sat !== D.sat) parts.push(`saturate(${F.sat}%)`);
+  if (F.contrast !== D.contrast) parts.push(`contrast(${F.contrast}%)`);
+  bg.style.filter = parts.length ? parts.join(' ') : 'none';
+  const c = parseColor(t['--background-shading']) || { r: 0, g: 0, b: 0, a: 0.9 };
+  $('#pvshade').style.background = `rgba(${c.r},${c.g},${c.b},${c.a * (+r['--background-shading-percent'] / 100)})`;
+  fr.className = 'pv scene-' + S.scene;
+  const out = buildCSS();
+  $('#out').value = out;
+  $('#count').textContent = lastN ? `(${lastN})` : '';
+  const w = $('#warn');
+  w.hidden = !lastWarn.length;
+  w.textContent = lastWarn.length ? 'Left out because the value was not safe to write as CSS: ' + lastWarn.join(', ') + '. Remove any braces, semicolons, comments or unbalanced brackets.' : '';
+}
+function replay() {
+  const m = $('#menu'), w = $('.pv-wrap'), mo = $('.pv-modal');
+  [m, w, mo].forEach(x => { x.style.animation = 'none'; });
+  void m.offsetWidth;
+  [m, w, mo].forEach(x => { x.style.animation = ''; });
+}
+function fit() {
+  const box = $('#stageBody'), fr = $('#frame');
+  const [a, b] = S.ratio.split('/').map(Number);
+  const narrow = window.matchMedia('(max-width:900px)').matches;
+  const pad = narrow ? 24 : 32;
+  const W = box.clientWidth - pad, H = narrow ? Infinity : box.clientHeight - pad;
+  if (W <= 0 || H <= 0) return;
+  let w = W, h = W * b / a;
+  if (h > H) { h = H; w = H * a / b; }
+  fr.style.width = Math.floor(w) + 'px'; fr.style.height = Math.floor(h) + 'px';
+}
+
+/* ---------- image info + edge colour ---------- */
+let probeT;
+function probeImage() {
+  clearTimeout(probeT);
+  probeT = setTimeout(() => {
+    const info = $('#imgInfo'), btn = $('#fillBtn');
+    if (!info) return;
+    btn.hidden = true;
+    const val = S.root['--background-image'] || 'none';
+    const m = /url\(\s*["']?([^"')]+?)["']?\s*\)/i.exec(val);
+    if (!m) { info.className = 'hint'; info.textContent = val === 'none' ? 'No image. The background is the solid fill color.' : 'Gradient background.'; return; }
+    const u = m[1];
+    if (!/^https:\/\//i.test(u)) { info.className = 'hint warn'; info.textContent = 'The link must start with https:// or Discord will not load it.'; return; }
+    info.className = 'hint'; info.textContent = 'Checking image...';
+    const im = new Image();
+    im.onload = () => {
+      info.textContent = `Image is ${im.naturalWidth}x${im.naturalHeight} (${(im.naturalWidth / im.naturalHeight).toFixed(2)}:1). Contain keeps all of it visible at any window shape.`;
+      edgeColor(u, btn);
+    };
+    im.onerror = () => { info.className = 'hint warn'; info.textContent = 'Could not load that image. Check that the link is public and goes straight to the file.'; };
+    im.src = u;
+  }, 300);
+}
+function edgeColor(u, btn) {
+  const im = new Image(); im.crossOrigin = 'anonymous';
+  im.onload = () => {
+    try {
+      const W = 48, H = 48, c = document.createElement('canvas'); c.width = W; c.height = H;
+      const x = c.getContext('2d'); x.drawImage(im, 0, 0, W, H);
+      const d = x.getImageData(0, 0, W, H).data;
+      let r = 0, g = 0, b = 0, n = 0;
+      for (let i = 0; i < W; i++) for (let j = 0; j < H; j++) {
+        if (!(i < 2 || j < 2 || i >= W - 2 || j >= H - 2)) continue;
+        const p = (j * W + i) * 4; r += d[p]; g += d[p + 1]; b += d[p + 2]; n++;
+      }
+      const hx = toHex({ r: Math.round(r / n), g: Math.round(g / n), b: Math.round(b / n) });
+      btn.dataset.hex = hx; btn.textContent = 'Match fill color to image edges (' + hx + ')'; btn.hidden = false;
+    } catch (e) { /* image host does not allow reading pixels */ }
+  };
+  im.src = u;
+}
+
+/* ---------- actions ---------- */
+let toastT;
+function toast(msg) {
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 1600);
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) {
+    const t = el('textarea', { style: 'position:fixed;opacity:0' }); t.value = text; document.body.append(t); t.select();
+    try { document.execCommand('copy'); } catch (e2) { /* ignore */ } t.remove();
+  }
+  toast('CSS copied');
+}
+$('#copy').onclick = () => copyText(buildCSS());
+$('#download').onclick = () => {
+  const a = el('a', { href: URL.createObjectURL(new Blob([buildCSS()], { type: 'text/css' })), download: 'INTOX-custom.css' });
+  document.body.append(a); a.click(); a.remove(); toast('Downloaded INTOX-custom.css');
+};
+$('#reset').onclick = () => {
+  const cur = S.cur, ratio = S.ratio, scene = S.scene;
+  S = { root: freshRoot(), f: freshF(), theme: freshThemes(), cur, ratio, scene };
+  syncAll(); save(); render(); probeImage(); toast('Reset to INTOX defaults');
+};
+$('#theme').onchange = e => { S.cur = e.target.value; syncAll(); save(); render(); };
+$('#ratio').onchange = e => { S.ratio = e.target.value; save(); fit(); };
+$('#scene').onchange = e => { S.scene = e.target.value; save(); render(); replay(); };
+const tab = which => {
+  const css = which === 'css';
+  $('#previewView').hidden = css; $('#cssView').hidden = !css;
+  $('#tabPreview').setAttribute('aria-selected', String(!css)); $('#tabCss').setAttribute('aria-selected', String(css));
+  if (!css) requestAnimationFrame(fit);
+};
+$('#tabPreview').onclick = () => tab('preview');
+$('#tabCss').onclick = () => tab('css');
+
+/* ---------- start ---------- */
+buildPanel(); syncAll(); render(); probeImage();
+new ResizeObserver(fit).observe($('#stageBody'));
+window.addEventListener('resize', fit);
+fit();
+})();
+</script>
+</body>
+</html>
