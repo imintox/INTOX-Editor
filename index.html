@@ -88,7 +88,8 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 .pv b{font-weight:600}
 .pv .grow{flex:1;min-width:0}
 .view-home :is(.v-server,.v-dm):not(.v-home),.view-server :is(.v-home,.v-dm):not(.v-server),.view-dm :is(.v-home,.v-server):not(.v-dm){display:none!important}
-.view-home .sel-home,.view-dm .sel-dm{background:var(--p-sel);color:#fff}
+.view-home .sel-home,.view-dm .dmr.cur{background:var(--p-sel);color:#fff}
+.pv [data-go],.pv [data-dm],.pv [data-ch],.pv [data-srv],.pv .mi{cursor:pointer}
 
 /* title bar */
 .tb{position:relative;flex:none;height:2.2em;display:flex;align-items:center;justify-content:center;font-size:.8em;font-weight:600;color:var(--p-muted)}
@@ -105,7 +106,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 .g:hover{border-radius:.95em}
 .g.home,.g.act{background:var(--p-card);color:var(--p-text)}
 .view-home .g.sel-home,.view-dm .g.sel-dm{background:var(--p-main);color:#fff}
-.view-server .g.sel-server::before,.view-home .g.sel-home::before,.view-dm .g.sel-dm::before,.g.unread-g::before{content:"";position:absolute;left:-1em;width:.25em;height:2.5em;background:#fff;border-radius:0 .25em .25em 0}
+.view-server .g.cur::before,.view-home .g.sel-home::before,.view-dm .g.sel-dm::before,.g.unread-g::before{content:"";position:absolute;left:-1em;width:.25em;height:2.5em;background:#fff;border-radius:0 .25em .25em 0}
 .g.unread-g::before{height:.5em}
 .rsep{flex:none;width:2em;height:1px;background:rgba(255,255,255,.1)}
 
@@ -379,19 +380,19 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
           <div class="pv-app" aria-hidden="true">
             <div class="tb">
               <span class="tb-t v-home"><svg class="ic"><use href="#i-friends"/></svg>Friends</span>
-              <span class="tb-t v-server"><span class="tb-ico" style="background:#3d4f8f">IL</span>INTOX Lounge</span>
+              <span class="tb-t v-server"><span class="tb-ico" data-s="ico" style="background:#3d4f8f">IL</span><span data-s="name">INTOX Lounge</span></span>
               <span class="tb-t v-dm"><svg class="ic"><use href="#i-chat"/></svg>Direct Messages</span>
               <span class="tb-r"><svg class="ic"><use href="#i-inbox"/></svg><svg class="ic"><use href="#i-help"/></svg></span>
             </div>
             <div class="pv-body">
               <nav class="rail">
-                <div class="g home sel-home sel-dm"><svg class="ic"><use href="#i-bubble"/></svg></div>
+                <div class="g home sel-home sel-dm" data-go="home"><svg class="ic"><use href="#i-bubble"/></svg></div>
                 <div class="rsep"></div>
-                <div class="g sel-server" style="background:#3d4f8f">IL</div>
-                <div class="g unread-g" style="background:#7a3f5e">NO</div>
-                <div class="g" style="background:#3f7a5e">GD</div>
-                <div class="g" style="background:#7a6a3f">AR</div>
-                <div class="g" style="background:#4f3f7a">PX</div>
+                <div class="g cur" data-srv="INTOX Lounge" style="background:#3d4f8f">IL</div>
+                <div class="g unread-g" data-srv="Night Owls" style="background:#7a3f5e">NO</div>
+                <div class="g" data-srv="Game Den" style="background:#3f7a5e">GD</div>
+                <div class="g" data-srv="Art Room" style="background:#7a6a3f">AR</div>
+                <div class="g" data-srv="Pixel Club" style="background:#4f3f7a">PX</div>
                 <div class="g act"><svg class="ic"><use href="#i-plus"/></svg></div>
                 <div class="g act"><svg class="ic"><use href="#i-compass"/></svg></div>
                 <div class="g act"><svg class="ic"><use href="#i-download"/></svg></div>
@@ -400,28 +401,28 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
               <aside class="side">
                 <div class="side-in v-home v-dm">
                   <div class="find">Find or start a conversation</div>
-                  <div class="nav sel-home"><svg class="ic"><use href="#i-friends"/></svg>Friends</div>
+                  <div class="nav sel-home" data-go="home"><svg class="ic"><use href="#i-friends"/></svg>Friends</div>
                   <div class="nav"><svg class="ic"><use href="#i-nitro"/></svg>Nitro<span class="nbadge">NEW</span></div>
                   <div class="nav"><svg class="ic"><use href="#i-shop"/></svg>Shop</div>
                   <div class="nav"><svg class="ic"><use href="#i-quest"/></svg>Quests</div>
                   <div class="dmh">Direct Messages<svg class="ic"><use href="#i-plus"/></svg></div>
-                  <div class="dmr"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div><div><div class="nm">Nova</div><div class="sub"><svg class="ic sm"><use href="#i-music"/></svg>Glass Avenue</div></div></div>
-                  <div class="dmr sel-dm"><div class="av" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div><div><div class="nm">Kit <span class="tag">INTX</span></div></div></div>
-                  <div class="dmr"><div class="av" style="background:#c0563f">M<span class="st" data-st="dnd"></span></div><div><div class="nm">Mira</div><div class="sub">brb, making tea</div></div></div>
-                  <div class="dmr"><div class="av" style="background:#4f6fb0">J<span class="st" data-st="streaming"></span></div><div><div class="nm">Juno</div></div></div>
-                  <div class="dmr off"><div class="av" style="background:#555a66">R<span class="st" data-st="offline"></span></div><div><div class="nm">Rex</div></div></div>
+                  <div class="dmr" data-dm="nova"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div><div><div class="nm">Nova</div><div class="sub"><svg class="ic sm"><use href="#i-music"/></svg>Glass Avenue</div></div></div>
+                  <div class="dmr cur" data-dm="kit"><div class="av" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div><div><div class="nm">Kit <span class="tag">INTX</span></div></div></div>
+                  <div class="dmr" data-dm="mira"><div class="av" style="background:#c0563f">M<span class="st" data-st="dnd"></span></div><div><div class="nm">Mira</div><div class="sub">brb, making tea</div></div></div>
+                  <div class="dmr" data-dm="juno"><div class="av" style="background:#4f6fb0">J<span class="st" data-st="streaming"></span></div><div><div class="nm">Juno</div></div></div>
+                  <div class="dmr off" data-dm="rex"><div class="av" style="background:#555a66">R<span class="st" data-st="offline"></span></div><div><div class="nm">Rex</div></div></div>
                 </div>
                 <div class="side-in v-server">
-                  <div class="banner"><span class="sname">INTOX Lounge<svg class="ic sm"><use href="#i-chev"/></svg></span></div>
+                  <div class="banner"><span class="sname"><span data-s="name">INTOX Lounge</span><svg class="ic sm"><use href="#i-chev"/></svg></span></div>
                   <div class="nav"><svg class="ic"><use href="#i-list"/></svg>Channels &amp; Roles</div>
                   <div class="cat">Information<svg class="ic sm"><use href="#i-chev"/></svg></div>
-                  <div class="ch sel"><svg class="ic"><use href="#i-mega"/></svg>announcements</div>
-                  <div class="ch"><svg class="ic"><use href="#i-hash"/></svg>rules</div>
+                  <div class="ch sel" data-ch="announcements" data-kind="news" data-ico="mega" data-topic="News and updates for this server."><svg class="ic"><use href="#i-mega"/></svg>announcements</div>
+                  <div class="ch" data-ch="rules" data-kind="text" data-ico="hash" data-topic="Read these before posting."><svg class="ic"><use href="#i-hash"/></svg>rules</div>
                   <div class="cat">General<svg class="ic sm"><use href="#i-chev"/></svg></div>
-                  <div class="ch unread"><svg class="ic"><use href="#i-hash"/></svg>general<span class="newb">2 NEW</span></div>
-                  <div class="ch"><svg class="ic"><use href="#i-hash"/></svg>media</div>
-                  <div class="ch"><svg class="ic"><use href="#i-forum"/></svg>showcase</div>
-                  <div class="ch muted"><svg class="ic"><use href="#i-hash"/></svg>off-topic</div>
+                  <div class="ch unread" data-ch="general" data-kind="text" data-ico="hash" data-topic="Talk about anything."><svg class="ic"><use href="#i-hash"/></svg>general<span class="newb">2 NEW</span></div>
+                  <div class="ch" data-ch="media" data-kind="text" data-ico="hash" data-topic="Screenshots, clips and art."><svg class="ic"><use href="#i-hash"/></svg>media</div>
+                  <div class="ch" data-ch="showcase" data-kind="forum" data-ico="forum" data-topic="Show off your setups."><svg class="ic"><use href="#i-forum"/></svg>showcase</div>
+                  <div class="ch muted" data-ch="off-topic" data-kind="text" data-ico="hash" data-topic="Everything else."><svg class="ic"><use href="#i-hash"/></svg>off-topic</div>
                   <div class="cat">Voice<svg class="ic sm"><use href="#i-chev"/></svg></div>
                   <div class="ch"><svg class="ic"><use href="#i-speaker"/></svg>Lounge</div>
                   <div class="vbadge"><span class="vdot"></span>3 IN VOICE</div>
@@ -438,13 +439,13 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
                   <div class="fl">
                     <div class="search"><svg class="ic sm"><use href="#i-search"/></svg>Search</div>
                     <div class="sublbl">Online - 3</div>
-                    <div class="fr"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div><div class="grow"><div class="nm">Nova</div><div class="sub"><svg class="ic sm"><use href="#i-music"/></svg>Glass Avenue</div></div><span class="cbtn"><svg class="ic sm"><use href="#i-chat"/></svg></span><span class="cbtn"><svg class="ic sm"><use href="#i-dots"/></svg></span></div>
-                    <div class="fr"><div class="av" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div><div class="grow"><div class="nm">Kit <span class="tag">INTX</span></div><div class="sub">Idle</div></div><span class="cbtn"><svg class="ic sm"><use href="#i-chat"/></svg></span><span class="cbtn"><svg class="ic sm"><use href="#i-dots"/></svg></span></div>
-                    <div class="fr"><div class="av" style="background:#c0563f">M<span class="st" data-st="dnd"></span></div><div class="grow"><div class="nm">Mira</div><div class="sub">brb, making tea</div></div><span class="cbtn"><svg class="ic sm"><use href="#i-chat"/></svg></span><span class="cbtn"><svg class="ic sm"><use href="#i-dots"/></svg></span></div>
+                    <div class="fr" data-dm="nova"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div><div class="grow"><div class="nm">Nova</div><div class="sub"><svg class="ic sm"><use href="#i-music"/></svg>Glass Avenue</div></div><span class="cbtn"><svg class="ic sm"><use href="#i-chat"/></svg></span><span class="cbtn"><svg class="ic sm"><use href="#i-dots"/></svg></span></div>
+                    <div class="fr" data-dm="kit"><div class="av" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div><div class="grow"><div class="nm">Kit <span class="tag">INTX</span></div><div class="sub">Idle</div></div><span class="cbtn"><svg class="ic sm"><use href="#i-chat"/></svg></span><span class="cbtn"><svg class="ic sm"><use href="#i-dots"/></svg></span></div>
+                    <div class="fr" data-dm="mira"><div class="av" style="background:#c0563f">M<span class="st" data-st="dnd"></span></div><div class="grow"><div class="nm">Mira</div><div class="sub">brb, making tea</div></div><span class="cbtn"><svg class="ic sm"><use href="#i-chat"/></svg></span><span class="cbtn"><svg class="ic sm"><use href="#i-dots"/></svg></span></div>
                   </div>
                   <aside class="rp">
                     <h5>Active Now</h5>
-                    <div class="anc">
+                    <div class="anc" data-dm="nova">
                       <div class="anr"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div><div class="grow"><div class="nm">Nova</div><div class="sub">Listening to music</div></div><svg class="ic"><use href="#i-music"/></svg></div>
                       <div class="anr inner"><div class="art"></div><div><div class="nm">Glass Avenue</div><div class="sub">Night Signals</div></div></div>
                     </div>
@@ -454,11 +455,11 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 
               <main class="mainv v-server">
                 <header class="hd">
-                  <svg class="ic"><use href="#i-mega"/></svg><span class="hd-t">announcements</span><span class="pill">Follow</span>
-                  <span class="topic">News and updates for the Lounge.</span>
+                  <svg class="ic"><use data-c="ico" href="#i-mega"/></svg><span class="hd-t" data-c="name">announcements</span><span class="pill" data-c="follow">Follow</span>
+                  <span class="topic" data-c="topic">News and updates for this server.</span>
                   <span class="grow"></span>
                   <svg class="ic"><use href="#i-thread"/></svg><svg class="ic"><use href="#i-bell"/></svg><svg class="ic"><use href="#i-pin"/></svg><svg class="ic"><use href="#i-members"/></svg>
-                  <span class="hsearch">Search INTOX Lounge<svg class="ic sm"><use href="#i-search"/></svg></span>
+                  <span class="hsearch"><span>Search <span data-s="name">INTOX Lounge</span></span><svg class="ic sm"><use href="#i-search"/></svg></span>
                 </header>
                 <div class="split rp-mem">
                   <div class="chat">
@@ -481,7 +482,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
                         <div class="code">--main-color: #4a6cf7;</div>
                       </div></div>
                     </div>
-                    <div class="composer"><svg class="ic"><use href="#i-plus"/></svg><span class="grow">Message #announcements</span><svg class="ic"><use href="#i-gift"/></svg><svg class="ic"><use href="#i-gif"/></svg><svg class="ic"><use href="#i-sticker"/></svg><svg class="ic"><use href="#i-emoji"/></svg></div>
+                    <div class="composer"><svg class="ic"><use href="#i-plus"/></svg><span class="grow" data-c="msg">Message #announcements</span><svg class="ic"><use href="#i-gift"/></svg><svg class="ic"><use href="#i-gif"/></svg><svg class="ic"><use href="#i-sticker"/></svg><svg class="ic"><use href="#i-emoji"/></svg></div>
                   </div>
                   <aside class="rp mem">
                     <div class="mg">Staff - 1</div>
@@ -499,30 +500,30 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 
               <main class="mainv v-dm">
                 <header class="hd">
-                  <div class="av xs" style="background:#3f8f7a">K</div><span class="hd-t">Kit</span>
+                  <div class="av xs" data-p="av" style="background:#3f8f7a">K</div><span class="hd-t" data-p="name">Kit</span>
                   <span class="grow"></span>
                   <svg class="ic"><use href="#i-phone"/></svg><svg class="ic"><use href="#i-video"/></svg><svg class="ic"><use href="#i-pin"/></svg><svg class="ic"><use href="#i-adduser"/></svg><svg class="ic"><use href="#i-profile"/></svg>
-                  <span class="hsearch">Search Kit<svg class="ic sm"><use href="#i-search"/></svg></span>
+                  <span class="hsearch"><span data-p="search">Search Kit</span><svg class="ic sm"><use href="#i-search"/></svg></span>
                 </header>
                 <div class="split rp-wide">
                   <div class="chat">
                     <div class="msgs">
                       <div class="dmstart">
-                        <div class="av xl" style="background:#3f8f7a">K</div>
-                        <h3>Kit</h3><div class="uname">kit.wav</div>
-                        <p>This is the beginning of your direct message history with <b>Kit</b>.</p>
+                        <div class="av xl" data-p="av" style="background:#3f8f7a">K</div>
+                        <h3 data-p="name">Kit</h3><div class="uname" data-p="user">kit.wav</div>
+                        <p>This is the beginning of your direct message history with <b data-p="name">Kit</b>.</p>
                         <div class="dmrow"><span class="sub">2 Mutual Servers</span><span class="gb">Remove Friend</span><span class="gb">Block</span></div>
                       </div>
                       <div class="div"><span>October 11, 2026</span></div>
-                      <div class="sys"><svg class="ic"><use href="#i-adduser"/></svg><span>You accepted <b>Kit</b>'s friend request.</span><time>10/11/26</time></div>
+                      <div class="sys"><svg class="ic"><use href="#i-adduser"/></svg><span>You accepted <b data-p="name">Kit</b>'s friend request.</span><time>10/11/26</time></div>
                       <div class="msg hov"><div class="av" style="background:#5865a0">Y</div><div class="mb">
                         <div class="mh"><b>you</b><time>10/11/26, 2:21 PM</time></div>
                         <div>just set up the new theme</div>
                       </div>
                         <div class="tbar"><span>👍</span><span>🔥</span><span>😂</span><i></i><svg class="ic sm"><use href="#i-emoji"/></svg><svg class="ic sm"><use href="#i-reply"/></svg><svg class="ic sm"><use href="#i-forward"/></svg><svg class="ic sm"><use href="#i-dots"/></svg></div>
                       </div>
-                      <div class="msg"><div class="av" style="background:#3f8f7a">K</div><div class="mb">
-                        <div class="mh"><b>Kit</b><span class="tag">INTX</span><time>10/11/26, 2:25 PM</time></div>
+                      <div class="msg"><div class="av" data-p="av" style="background:#3f8f7a">K</div><div class="mb">
+                        <div class="mh"><b data-p="name">Kit</b><span class="tag" data-p="tag">INTX</span><time>10/11/26, 2:25 PM</time></div>
                         <div><a>invite.example/night-owls</a></div>
                         <div class="invite">
                           <div class="ib"></div>
@@ -534,15 +535,15 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
                       </div></div>
                       <div class="div"><span>Today</span></div>
                       <div class="msg"><div class="av" style="background:#5865a0">Y</div><div class="mb"><div class="mh"><b>you</b><time>11:22 AM</time></div><div>looks so clean</div></div></div>
-                      <div class="msg"><div class="av" style="background:#3f8f7a">K</div><div class="mb"><div class="mh"><b>Kit</b><span class="tag">INTX</span><time>11:24 AM</time></div><div>agreed, the black is perfect</div></div></div>
+                      <div class="msg"><div class="av" data-p="av" style="background:#3f8f7a">K</div><div class="mb"><div class="mh"><b data-p="name">Kit</b><span class="tag" data-p="tag">INTX</span><time>11:24 AM</time></div><div>agreed, the black is perfect</div></div></div>
                     </div>
-                    <div class="composer"><svg class="ic"><use href="#i-plus"/></svg><span class="grow">Message @Kit</span><svg class="ic"><use href="#i-gift"/></svg><svg class="ic"><use href="#i-gif"/></svg><svg class="ic"><use href="#i-sticker"/></svg><svg class="ic"><use href="#i-emoji"/></svg><svg class="ic"><use href="#i-apps"/></svg></div>
+                    <div class="composer"><svg class="ic"><use href="#i-plus"/></svg><span class="grow" data-p="msg">Message @Kit</span><svg class="ic"><use href="#i-gift"/></svg><svg class="ic"><use href="#i-gif"/></svg><svg class="ic"><use href="#i-sticker"/></svg><svg class="ic"><use href="#i-emoji"/></svg><svg class="ic"><use href="#i-apps"/></svg></div>
                   </div>
                   <aside class="rp prof">
                     <div class="pban"></div>
-                    <div class="av xl ring" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div>
-                    <h4>Kit</h4>
-                    <div class="sub">kit.wav <span class="tag">INTX</span></div>
+                    <div class="av xl ring" data-p="av" style="background:#3f8f7a">K<span class="st" data-st="idle" data-p="st"></span></div>
+                    <h4 data-p="name">Kit</h4>
+                    <div class="sub"><span data-p="user">kit.wav</span> <span class="tag" data-p="tag">INTX</span></div>
                     <div class="badges"><i style="background:#4fd18b"></i><i style="background:#57b0f0"></i><i style="background:#f0b232"></i><i style="background:#a07cf0"></i></div>
                     <div class="sub">2 Mutual Servers</div>
                     <div class="plbl">Member Since</div>

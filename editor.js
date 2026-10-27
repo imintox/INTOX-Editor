@@ -482,6 +482,84 @@ function fit() {
   fr.style.width = Math.floor(w) + 'px'; fr.style.height = Math.floor(h) + 'px';
 }
 
+/* ---------- clickable preview ---------- */
+// Everything shown here is made up. Text is set with textContent only.
+const PEOPLE = {
+  nova: { name: 'Nova', user: 'nova.fm', bg: '#7a5cc0', st: 'online', tag: false },
+  kit: { name: 'Kit', user: 'kit.wav', bg: '#3f8f7a', st: 'idle', tag: true },
+  mira: { name: 'Mira', user: 'mira.tea', bg: '#c0563f', st: 'dnd', tag: false },
+  juno: { name: 'Juno', user: 'junobeam', bg: '#4f6fb0', st: 'streaming', tag: false },
+  rex: { name: 'Rex', user: 'rex_404', bg: '#555a66', st: 'offline', tag: false }
+};
+const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
+function setView(v) {
+  if (!VIEWS.includes(v)) return;
+  S.view = v; $('#view').value = v; save(); render();
+}
+function setOverlay(v, keepPosition) {
+  if (!SCENES.includes(v)) return;
+  if (!keepPosition) { const m = $('#menu'); m.style.left = ''; m.style.top = ''; }
+  S.scene = v; $('#scene').value = v; save(); render();
+  if (v !== 'none') replay();
+}
+function openDM(key) {
+  if (!has(PEOPLE, key)) return;
+  const P = PEOPLE[key], fr = $('#frame');
+  $$('.dmr[data-dm]', fr).forEach(r => r.classList.toggle('cur', r.dataset.dm === key));
+  $$('[data-p="name"]', fr).forEach(e => { e.textContent = P.name; });
+  $$('[data-p="user"]', fr).forEach(e => { e.textContent = P.user; });
+  $$('[data-p="search"]', fr).forEach(e => { e.textContent = 'Search ' + P.name; });
+  $$('[data-p="msg"]', fr).forEach(e => { e.textContent = 'Message @' + P.name; });
+  $$('[data-p="tag"]', fr).forEach(e => { e.hidden = !P.tag; });
+  $$('[data-p="st"]', fr).forEach(e => { e.dataset.st = P.st; });
+  $$('[data-p="av"]', fr).forEach(e => {
+    e.style.background = P.bg;
+    if (e.firstChild && e.firstChild.nodeType === 3) e.firstChild.nodeValue = P.name[0];
+  });
+  setView('dm');
+}
+function openServer(icon) {
+  const fr = $('#frame');
+  $$('.g[data-srv]', fr).forEach(g => g.classList.toggle('cur', g === icon));
+  $$('[data-s="name"]', fr).forEach(e => { e.textContent = icon.dataset.srv; });
+  const ico = $('[data-s="ico"]', fr); if (ico) ico.style.background = icon.style.background;
+  setView('server');
+}
+function openChannel(ch) {
+  const fr = $('#frame');
+  $$('.ch[data-ch]', fr).forEach(c => c.classList.toggle('sel', c === ch));
+  $('[data-c="name"]', fr).textContent = ch.dataset.ch;
+  $('[data-c="topic"]', fr).textContent = ch.dataset.topic;
+  $('[data-c="msg"]', fr).textContent = 'Message #' + ch.dataset.ch;
+  $('[data-c="follow"]', fr).hidden = ch.dataset.kind !== 'news';
+  const ico = ch.dataset.ico;
+  if (['mega', 'hash', 'forum'].includes(ico)) $('[data-c="ico"]', fr).setAttribute('href', '#i-' + ico);
+}
+$('#frame').addEventListener('click', e => {
+  const t = e.target;
+  if (!(t instanceof Element)) return;
+  // An open menu closes on any click, like Discord. A window closes when you click outside it.
+  if (S.scene === 'menu') { setOverlay('none'); return; }
+  if (S.scene === 'window') { if (!t.closest('.pv-modal')) setOverlay('none'); return; }
+  const go = t.closest('[data-go]');
+  if (go) { setView(go.dataset.go); return; }
+  const dm = t.closest('[data-dm]');
+  if (dm) { openDM(dm.dataset.dm); return; }
+  const srv = t.closest('.g[data-srv]');
+  if (srv) { openServer(srv); return; }
+  const ch = t.closest('.ch[data-ch]');
+  if (ch) openChannel(ch);
+});
+$('#frame').addEventListener('contextmenu', e => {
+  if (!(e.target instanceof Element) || !e.target.closest('.pv-app')) return;
+  e.preventDefault();
+  const fr = $('#frame'), m = $('#menu'), r = fr.getBoundingClientRect();
+  setOverlay('menu', true);
+  const x = Math.min(e.clientX - r.left, r.width - m.offsetWidth - 6);
+  const y = Math.min(e.clientY - r.top, r.height - m.offsetHeight - 6);
+  m.style.left = Math.max(6, x) + 'px'; m.style.top = Math.max(6, y) + 'px';
+});
+
 /* ---------- image info + edge colour ---------- */
 let probeT;
 function probeImage() {
@@ -552,7 +630,7 @@ $('#reset').onclick = () => {
 };
 $('#theme').onchange = e => { S.cur = e.target.value; syncAll(); save(); render(); };
 $('#ratio').onchange = e => { S.ratio = e.target.value; save(); fit(); };
-$('#scene').onchange = e => { S.scene = e.target.value; save(); render(); replay(); };
+$('#scene').onchange = e => setOverlay(e.target.value);
 $('#view').onchange = e => { S.view = e.target.value; save(); render(); replay(); };
 const tab = which => {
   const css = which === 'css';
