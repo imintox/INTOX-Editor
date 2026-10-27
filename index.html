@@ -340,9 +340,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 .f-hover-channels .ch:hover{padding-left:.85em}
 .f-hover-avatars .msg>.av:hover{transform:scale(1.06)}
 /* clean up switches */
-.f-hide-nitro .nav-nitro,.f-hide-shop .nav-shop,.f-hide-quests .nav-quests,.f-hide-active-now .rp.an{display:none}
-.f-hide-requests .nav-requests,.f-hide-family .nav-family,.f-hide-add-server .rb-add,.f-hide-discover .rb-disc,.f-hide-download .rb-dl,.f-hide-help .tb-help,.f-hide-gift .cg-gift{display:none}
-.f-hide-active-now .split.rp-wide.home-split{grid-template-columns:1fr}
+.f-hide-nitro .nav-nitro,.f-hide-shop .nav-shop,.f-hide-quests .nav-quests{display:none}
 /* extras */
 .f-vignette .pv-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.65))}
 .f-selection .pv-app ::selection{background:color-mix(in srgb,var(--p-main) 45%,transparent)}
@@ -391,8 +389,6 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
   <symbol id="i-video" viewBox="0 0 16 16"><rect x="1.8" y="4" width="8.7" height="8" rx="1.5"/><path d="m10.5 7 3.7-2v6l-3.7-2"/></symbol>
   <symbol id="i-adduser" viewBox="0 0 16 16"><circle cx="6.5" cy="5.5" r="2.5"/><path d="M2 13.5c0-2.5 2-4.2 4.5-4.2 1 0 1.9.3 2.6.7M12.5 9v5M10 11.5h5"/></symbol>
   <symbol id="i-profile" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="6.8" r="2"/><path d="M4.3 12.3c.8-1.4 2.1-2.3 3.7-2.3s2.9.9 3.7 2.3"/></symbol>
-  <symbol id="i-mailbox" viewBox="0 0 16 16"><rect x="2" y="3.5" width="12" height="9" rx="1.2"/><path d="m2.5 4.5 5.5 4 5.5-4"/></symbol>
-  <symbol id="i-family" viewBox="0 0 16 16"><circle cx="5.5" cy="5" r="2"/><circle cx="11" cy="6" r="1.6"/><path d="M1.8 13c.3-2.4 1.8-3.8 3.7-3.8s3.4 1.4 3.7 3.8M8.6 13c.2-1.8 1.2-2.9 2.4-2.9s2.2 1.1 2.4 2.9"/></symbol>
   <symbol id="i-inbox" viewBox="0 0 16 16"><path d="M2.5 9.5 4 3.5h8l1.5 6v3.5h-11z"/><path d="M2.5 9.5h3l1 1.5h3l1-1.5h3"/></symbol>
   <symbol id="i-help" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.3 6.3a1.8 1.8 0 1 1 2.4 1.7c-.5.2-.7.6-.7 1.1v.4M8 11.6v.1"/></symbol>
   <symbol id="i-gift" viewBox="0 0 16 16"><rect x="2.5" y="6" width="11" height="7.5" rx="1"/><path d="M2 6h12M8 6v7.5M8 6C6.5 3 4.5 3.5 5 5s3 1 3 1 2.5.5 3-1-1.5-2-3 1"/></symbol>
@@ -478,7 +474,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
               <span class="tb-t v-home"><svg class="ic"><use href="#i-friends"/></svg>Friends</span>
               <span class="tb-t v-server"><span class="tb-ico" data-s="ico" style="background:#3d4f8f">IL</span><span data-s="name">INTOX Lounge</span></span>
               <span class="tb-t v-dm"><svg class="ic"><use href="#i-chat"/></svg>Direct Messages</span>
-              <span class="tb-r"><svg class="ic"><use href="#i-inbox"/></svg><svg class="ic tb-help"><use href="#i-help"/></svg></span>
+              <span class="tb-r"><svg class="ic"><use href="#i-inbox"/></svg><svg class="ic"><use href="#i-help"/></svg></span>
             </div>
             <div class="pv-body">
               <nav class="rail">
@@ -492,9 +488,9 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
                 <div class="g" data-srv="Mix Lab" style="background:#3f6a7a">ML</div>
                 <div class="g" data-srv="Sketch Club" style="background:#7a4f3f">SC</div>
                 <div class="g" data-srv="Lo-fi Room" style="background:#5a3f7a">LR</div>
-                <div class="g act rb-add"><svg class="ic"><use href="#i-plus"/></svg></div>
-                <div class="g act rb-disc"><svg class="ic"><use href="#i-compass"/></svg></div>
-                <div class="g act rb-dl"><svg class="ic"><use href="#i-download"/></svg></div>
+                <div class="g act"><svg class="ic"><use href="#i-plus"/></svg></div>
+                <div class="g act"><svg class="ic"><use href="#i-compass"/></svg></div>
+                <div class="g act"><svg class="ic"><use href="#i-download"/></svg></div>
               </nav>
 
               <aside class="side">
@@ -504,8 +500,6 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
                   <div class="nav nav-nitro"><svg class="ic"><use href="#i-nitro"/></svg>Nitro<span class="nbadge">NEW</span></div>
                   <div class="nav nav-shop"><svg class="ic"><use href="#i-shop"/></svg>Shop</div>
                   <div class="nav nav-quests"><svg class="ic"><use href="#i-quest"/></svg>Quests</div>
-                  <div class="nav nav-requests"><svg class="ic"><use href="#i-mailbox"/></svg>Message Requests<span class="nbadge">1</span></div>
-                  <div class="nav nav-family"><svg class="ic"><use href="#i-family"/></svg>Family Center</div>
                   <div class="dmh">Direct Messages<svg class="ic"><use href="#i-plus"/></svg></div>
                   <div class="dmr" data-dm="nova"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div><div><div class="nm">Nova</div><div class="sub"><svg class="ic sm"><use href="#i-music"/></svg>Glass Avenue</div></div></div>
                   <div class="dmr cur" data-dm="kit"><div class="av" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div><div><div class="nm">Kit <span class="tag">INTX</span></div></div></div>
@@ -583,7 +577,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
                         <div class="code">--main-color: #4a6cf7;</div>
                       </div></div>
                     </div>
-                    <div class="composer"><svg class="ic"><use href="#i-plus"/></svg><span class="grow" data-c="msg">Message #announcements</span><svg class="ic cg-gift"><use href="#i-gift"/></svg><svg class="ic"><use href="#i-gif"/></svg><svg class="ic"><use href="#i-sticker"/></svg><svg class="ic"><use href="#i-emoji"/></svg></div>
+                    <div class="composer"><svg class="ic"><use href="#i-plus"/></svg><span class="grow" data-c="msg">Message #announcements</span><svg class="ic"><use href="#i-gift"/></svg><svg class="ic"><use href="#i-gif"/></svg><svg class="ic"><use href="#i-sticker"/></svg><svg class="ic"><use href="#i-emoji"/></svg></div>
                   </div>
                   <aside class="rp mem">
                     <div class="mg">Staff - 1</div>
@@ -638,7 +632,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
                       <div class="msg"><div class="av" style="background:#5865a0">Y</div><div class="mb"><div class="mh"><b>you</b><time>11:22 AM</time></div><div>looks so clean</div></div></div>
                       <div class="msg"><div class="av" data-p="av" style="background:#3f8f7a">K</div><div class="mb"><div class="mh"><b data-p="name">Kit</b><span class="tag" data-p="tag">INTX</span><time>11:24 AM</time></div><div>agreed, the black is perfect</div></div></div>
                     </div>
-                    <div class="composer"><svg class="ic"><use href="#i-plus"/></svg><span class="grow" data-p="msg">Message @Kit</span><svg class="ic cg-gift"><use href="#i-gift"/></svg><svg class="ic"><use href="#i-gif"/></svg><svg class="ic"><use href="#i-sticker"/></svg><svg class="ic"><use href="#i-emoji"/></svg><svg class="ic"><use href="#i-apps"/></svg></div>
+                    <div class="composer"><svg class="ic"><use href="#i-plus"/></svg><span class="grow" data-p="msg">Message @Kit</span><svg class="ic"><use href="#i-gift"/></svg><svg class="ic"><use href="#i-gif"/></svg><svg class="ic"><use href="#i-sticker"/></svg><svg class="ic"><use href="#i-emoji"/></svg><svg class="ic"><use href="#i-apps"/></svg></div>
                   </div>
                   <aside class="rp prof">
                     <div class="pban"></div>
