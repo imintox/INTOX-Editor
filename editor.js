@@ -442,7 +442,7 @@ function buildPanel() {
   p.append(buildLooks());
   p.append(el('div', { class: 'note b more' }, 'Showing the essentials. ', el('button', { type: 'button', class: 'linkbtn', 'data-mode': 'advanced' }, 'Show all settings')));
   $$('.linkbtn', p).forEach(btn => { btn.onclick = () => setMode('advanced'); });
-  p.append(el('div', { class: 'note b' }, 'Only values you change are written to the CSS output. INTOX 1.1.0'));
+  p.append(el('div', { class: 'note b' }, 'Only values you change are written to the CSS output. INTOX 1.1.1'));
 }
 
 function syncAll() {
@@ -548,7 +548,7 @@ function render() {
   w.textContent = lastWarn.length ? 'Left out because the value was not safe to write as CSS: ' + lastWarn.join(', ') + '. Remove any braces, semicolons, comments or unbalanced brackets.' : '';
 }
 function replay() {
-  const els = [$('#menu'), $('.pv-wrap'), $('.pv-modal'), ...$$('.tbar'), ...$$('#frame .msg')];
+  const els = [$('#menu'), $('.pv-settings'), ...$$('.tbar'), ...$$('#frame .msg')];
   els.forEach(x => { x.style.animation = 'none'; });
   void els[0].offsetWidth;
   els.forEach(x => { x.style.animation = ''; });
@@ -714,7 +714,18 @@ $('#frame').addEventListener('click', e => {
   if (!(t instanceof Element)) return;
   // An open menu closes on any click, like Discord. A window closes when you click outside it.
   if (S.scene === 'menu') { setOverlay('none'); return; }
-  if (S.scene === 'window') { if (!t.closest('.pv-modal')) setOverlay('none'); return; }
+  if (S.scene === 'window') {
+    // the settings page closes with its X (or Escape); its menu items can be picked
+    if (t.closest('.st-x')) { setOverlay('none'); return; }
+    const item = t.closest('.sn[data-sn]');
+    if (item) {
+      const page = $('.pv-settings');
+      $$('.sn', page).forEach(e => e.classList.toggle('on', e === item));
+      $('[data-stitle]', page).textContent = item.dataset.sn;
+      page.classList.toggle('not-account', item.dataset.sn !== 'Account');
+    }
+    return;
+  }
   const go = t.closest('[data-go]');
   if (go) { setView(go.dataset.go); return; }
   const dm = t.closest('[data-dm]');

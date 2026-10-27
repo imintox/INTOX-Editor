@@ -110,7 +110,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 /* ===== preview: a mock of Discord driven by the editor values. All names and messages are made up. ===== */
 .pv{position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--line2);container-name:pv;container-type:inline-size;background:#000;font-family:var(--p-font);color:var(--p-text);filter:var(--p-filter,none)}
 .pv-fill,.pv-bg,.pv-shade{position:absolute;inset:0}
-.pv-app,.pv-menu,.pv-modal{font-size:clamp(6px,1.1cqw,16px)}
+.pv-app,.pv-menu,.pv-settings{font-size:clamp(6px,1.1cqw,16px)}
 .pv-app{position:absolute;inset:0;display:flex;flex-direction:column;line-height:1.35}
 .pv .ic{width:1.25em;height:1.25em;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .pv .ic.sm{width:1em;height:1em}
@@ -279,17 +279,41 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 .mi .r{transform:rotate(-90deg)}
 .mi.danger{color:var(--p-danger)}
 .msep{height:1px;background:rgba(255,255,255,.08);margin:.3em .4em}
-.pv-wrap{display:none;position:absolute;inset:0;place-items:center;background:rgba(0,0,0,.55);animation-name:var(--p-backdrop-anim,intox-fade);animation-duration:var(--p-speed);animation-timing-function:var(--p-ease);animation-fill-mode:both}
-.ov-window .pv-wrap{display:grid}
-.pv-modal{width:min(62%,34em);padding:1.5em;background:var(--p-modal);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));border:1px solid var(--p-border);border-radius:var(--p-radius);color:var(--p-text);animation-name:var(--p-window-anim,none);animation-duration:var(--p-speed);animation-timing-function:var(--p-ease);animation-fill-mode:both}
-.pv-modal h4{margin:0 0 1em;font-size:1.3em}
-.mrow{display:flex;justify-content:space-between;align-items:center;padding:.7em 0;border-bottom:1px solid rgba(255,255,255,.06)}
+/* settings page (a mockup in the spirit of Discord's, not a copy) */
+.pv-settings{display:none;position:absolute;inset:0;grid-template-columns:16em 1fr;grid-template-rows:100%;overflow:hidden;background:var(--p-modal);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));color:var(--p-text);line-height:1.35;animation-name:var(--p-window-anim,none);animation-duration:var(--p-speed);animation-timing-function:var(--p-ease);animation-fill-mode:both}
+.ov-window .pv-settings{display:grid}
+.st-side{display:flex;flex-direction:column;gap:.12em;padding:.9em .7em;overflow:hidden;min-height:0;background:var(--p-card);border-right:1px solid rgba(255,255,255,.05)}
+.st-me{display:flex;align-items:center;gap:.7em;padding:.2em .4em .8em}
+.st-me .av{width:2.6em;height:2.6em}
+.st-me .sub{gap:.35em}
+.st-search{display:flex;align-items:center;gap:.5em;margin-bottom:.6em;padding:.5em .7em;border-radius:.5em;background:var(--p-input);color:var(--p-muted);font-size:.9em}
+.sn{display:flex;align-items:center;gap:.7em;padding:.45em .6em;border-radius:.45em;color:var(--p-muted);font-weight:500;transition:background var(--p-speed) var(--p-ease),color var(--p-speed) var(--p-ease)}
+.sn:hover{background:rgba(255,255,255,.05);color:var(--p-text)}
+.sn.on{background:var(--p-sel);color:#fff}
+.ssub{margin-left:1.55em;padding:.32em .8em;border-left:2px solid rgba(255,255,255,.1);color:var(--p-muted);font-size:.9em}
+.ssub.on{border-left-color:var(--p-text);color:var(--p-text)}
+.pv-settings.not-account .ssub{display:none}
+.sh{margin:.9em .6em .25em;font-size:.75em;font-weight:600;color:var(--p-muted)}
+.st-main{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+.st-top{flex:none;display:flex;justify-content:space-between;align-items:center;padding:.7em 1.1em;font-weight:600}
+.st-x{width:2em;height:2em;display:grid;place-items:center;border-radius:50%;color:var(--p-muted);transition:background var(--p-speed) var(--p-ease)}
+.st-x:hover{background:rgba(255,255,255,.08);color:var(--p-text)}
+.st-scroll{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--p-scroll,rgba(255,255,255,.16)) transparent}
+.st-body{width:min(100%,38em);margin:0 auto;padding:.4em 1.5em 2em}
+.st-body h3{margin:1em 0 .5em;font-size:1.3em;font-weight:600}
+.st-body hr{border:0;border-top:1px solid rgba(255,255,255,.07);margin:1em 0 .4em}
+.sr{display:flex;align-items:center;gap:1em;padding:.5em 0}
+.sr>b{flex:1;font-weight:500}
+.sv{font-size:.92em}
+.gbtn{padding:.45em 1.1em;border-radius:.45em;background:rgba(255,255,255,.08);font-weight:500;font-size:.9em}
+.sico{flex:none;width:2.4em;height:2.4em;border-radius:.5em;display:grid;place-items:center;background:rgba(255,255,255,.06)}
+.sico.ok{color:var(--p-success);background:color-mix(in srgb,var(--p-success) 16%,transparent)}
+.sbtns{display:flex;gap:.6em;margin-top:.3em}
+.pv [data-sn],.pv .st-x{cursor:pointer}
 .sw{width:2.7em;height:1.5em;border-radius:1em;background:rgba(255,255,255,.18);position:relative;transition:background var(--p-speed) var(--p-ease)}
 .sw::after{content:"";position:absolute;top:.2em;left:.2em;width:1.1em;height:1.1em;border-radius:50%;background:#fff;transition:transform var(--p-speed) var(--p-ease)}
 .sw.on{background:var(--p-main)}
 .sw.on::after{transform:translateX(1.2em)}
-.minput{margin-top:1em;padding:.7em .9em;background:var(--p-input);border-radius:calc(var(--p-radius) * .6);color:var(--p-muted)}
-.mbtns{display:flex;gap:.6em;margin-top:1.2em;justify-content:flex-end}
 .pb{padding:.55em 1.1em;border-radius:calc(var(--p-radius) * .6);color:#fff;font-weight:600;background:var(--p-main);transition:background var(--p-speed) var(--p-ease)}
 .pb:hover{background:var(--p-hover)}
 .pb.ghost{background:rgba(255,255,255,.08)}
@@ -378,6 +402,15 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
   <symbol id="i-forward" viewBox="0 0 16 16"><path d="M9.5 4 13 7.5 9.5 11"/><path d="M12.5 7.5H6A3.5 3.5 0 0 0 2.5 11v1"/></symbol>
   <symbol id="i-music" viewBox="0 0 16 16"><path d="M6 12V3.5l7-1.5v8.5"/><circle cx="4.5" cy="12" r="1.5"/><circle cx="11.5" cy="10.5" r="1.5"/></symbol>
   <symbol id="i-game" viewBox="0 0 16 16"><rect x="1.8" y="5" width="12.4" height="7" rx="3.5"/><path d="M5 7.3v2.4M3.8 8.5h2.4M10.5 8h.1M12 9.5h.1"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 16 16"><path d="M8 1.8 13 3.6v4.1c0 3-2.1 5.2-5 6.5-2.9-1.3-5-3.5-5-6.5V3.6z"/></symbol>
+  <symbol id="i-card" viewBox="0 0 16 16"><rect x="1.8" y="3.5" width="12.4" height="9" rx="1.5"/><path d="M1.8 6.5h12.4M4.5 10h2.5"/></symbol>
+  <symbol id="i-palette" viewBox="0 0 16 16"><path d="M8 1.8a6.2 6.2 0 1 0 0 12.4c.9 0 1.3-.6 1.3-1.2 0-.8-.6-1.1-.6-1.8 0-.6.5-1 1.1-1h1.6a2.8 2.8 0 0 0 2.8-2.8C14.2 4.4 11.4 1.8 8 1.8z"/><path d="M5 7.2h.1M6.8 4.8h.1M9.6 4.8h.1"/></symbol>
+  <symbol id="i-access" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2"/><circle cx="8" cy="5" r=".9"/><path d="M5 7h6M8 7v2.5l-1.5 2.5M8 9.5l1.5 2.5"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M2 8h12M8 2c1.8 1.7 2.6 3.8 2.6 6S9.8 12.3 8 14c-1.8-1.7-2.6-3.8-2.6-6S6.2 3.7 8 2z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 16 16"><path d="m4 4 8 8M12 4l-8 8"/></symbol>
+  <symbol id="i-chevr" viewBox="0 0 16 16"><path d="m6 3.5 4.5 4.5L6 12.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 16 16"><path d="m3.5 8.5 3 3 6-7"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 16 16"><path d="M10.5 2.5l3 3-8 8H2.5v-3z"/></symbol>
   <symbol id="i-bubble" viewBox="0 0 16 16"><path d="M3 4.5A2.5 2.5 0 0 1 5.5 2h5A2.5 2.5 0 0 1 13 4.5v4a2.5 2.5 0 0 1-2.5 2.5H7.3L4.5 13.5V11A2.5 2.5 0 0 1 3 8.7z" fill="currentColor" stroke="none"/></symbol>
 </svg>
 <header class="top">
@@ -426,7 +459,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
           <select id="scene" aria-label="Preview overlay">
             <option value="none">None</option>
             <option value="menu">Right-click menu</option>
-            <option value="window">Settings window</option>
+            <option value="window">Settings page</option>
           </select>
         </label>
         <span>Try different window shapes to see how the background fits.</span>
@@ -633,14 +666,9 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
             <div class="mi">Copy Link</div>
             <div class="mi danger">Delete Channel</div>
           </div>
-          <div class="pv-wrap" aria-hidden="true">
-            <div class="pv-modal">
-              <h4>Appearance</h4>
-              <div class="mrow"><span>Compact mode</span><span class="sw on"></span></div>
-              <div class="mrow"><span>Reduce motion</span><span class="sw"></span></div>
-              <div class="minput">Display name</div>
-              <div class="mbtns"><span class="pb ghost">Cancel</span><span class="pb red">Reset</span><span class="pb">Save changes</span></div>
-            </div>
+          <div class="pv-settings" aria-hidden="true">
+            <aside class="st-side"><div class="st-me"><div class="av" style="background:#5865a0">Y<span class="st" data-st="online"></span></div><div><div class="nm">you</div><div class="sub">Edit Profiles<svg class="ic sm"><use href="#i-pen"/></svg></div></div></div><div class="st-search"><svg class="ic sm"><use href="#i-search"/></svg>Search</div><div class="sn on" data-sn="Account"><svg class="ic"><use href="#i-profile"/></svg>Account</div><div class="ssub on">Account Info</div><div class="ssub">Password &amp; Security</div><div class="ssub">Account Status</div><div class="sn" data-sn="Data &amp; Privacy"><svg class="ic"><use href="#i-shield"/></svg>Data &amp; Privacy</div><div class="sn" data-sn="Notifications"><svg class="ic"><use href="#i-bell"/></svg>Notifications</div><div class="sh">Billing</div><div class="sn" data-sn="Nitro"><svg class="ic"><use href="#i-nitro"/></svg>Nitro</div><div class="sn" data-sn="Subscriptions"><svg class="ic"><use href="#i-card"/></svg>Subscriptions</div><div class="sn" data-sn="Gift Inventory"><svg class="ic"><use href="#i-gift"/></svg>Gift Inventory</div><div class="sh">Experience</div><div class="sn" data-sn="Voice &amp; Video"><svg class="ic"><use href="#i-mic"/></svg>Voice &amp; Video</div><div class="sn" data-sn="Appearance"><svg class="ic"><use href="#i-palette"/></svg>Appearance</div><div class="sn" data-sn="Accessibility"><svg class="ic"><use href="#i-access"/></svg>Accessibility</div><div class="sn" data-sn="Language &amp; Time"><svg class="ic"><use href="#i-globe"/></svg>Language &amp; Time</div></aside>
+            <main class="st-main"><div class="st-top"><span data-stitle>Account</span><span class="st-x" title="Close"><svg class="ic"><use href="#i-x"/></svg></span></div><div class="st-scroll"><div class="st-body"><h3>Account Info</h3><div class="sr"><b>Username</b><span class="sv">you</span><span class="gbtn">Edit</span></div><div class="sr"><b>Email</b><span class="sv">••••••••@example.com <a>Reveal</a></span><span class="gbtn">Edit</span></div><div class="sr"><b>Phone Number</b><span class="sv">Not added</span><span class="gbtn">Add</span></div><hr><h3>Password &amp; Security</h3><div class="sr"><b>Password</b><span class="gbtn">Edit</span></div><div class="sr"><b>Multi-Factor Authentication</b><span class="sv">Enabled</span><svg class="ic sm"><use href="#i-chevr"/></svg></div><div class="sr"><b>Logged-in Devices</b><span class="sv">2 devices</span><svg class="ic sm"><use href="#i-chevr"/></svg></div><hr><h3>Privacy</h3><div class="sr"><b>Allow messages from server members</b><span class="sw on"></span></div><div class="sr"><b>Share what you are playing</b><span class="sw"></span></div><hr><h3>Account Status</h3><div class="sr"><span class="sico ok"><svg class="ic"><use href="#i-check"/></svg></span><div class="grow"><b>Account Standing</b><div class="sub">You are in good standing. Anything that changes that would show up here.</div></div><span class="sv">All good</span><svg class="ic sm"><use href="#i-chevr"/></svg></div><hr><h3>Account Removal</h3><div class="sub">Disabling your account means you can recover it at any time.</div><div class="sbtns"><span class="pb red">Delete Account</span><span class="pb ghost">Disable Account</span></div></div></div></main>
           </div>
         </div>
       </div>
