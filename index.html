@@ -78,55 +78,180 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 #toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,12px);background:#fff;color:#000;padding:8px 14px;border-radius:999px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:10}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 
-/* ===== preview (a small mock of Discord, driven by the editor values) ===== */
+/* ===== preview: a mock of Discord driven by the editor values. All names and messages are made up. ===== */
 .pv{position:relative;overflow:hidden;border-radius:10px;border:1px solid var(--line2);container-name:pv;container-type:inline-size;background:#000;font-family:var(--p-font);color:var(--p-text);filter:var(--p-filter,none)}
 .pv-fill,.pv-bg,.pv-shade{position:absolute;inset:0}
-.pv-app{position:absolute;inset:0;display:grid;grid-template-columns:4.8em 14.5em 1fr 13.5em;font-size:clamp(7px,1.25cqw,15px);line-height:1.4}
-.pv-guilds{display:flex;flex-direction:column;align-items:center;gap:.7em;padding:.8em 0}
-.g{position:relative;width:3.1em;height:3.1em;border-radius:50%;background:var(--p-card);display:grid;place-items:center;font-weight:700;color:var(--p-muted);transition:border-radius var(--p-speed) var(--p-ease),background var(--p-speed) var(--p-ease)}
-.g:hover{border-radius:1em;background:rgba(255,255,255,.1)}
-.g.sel{background:var(--p-main);color:#fff;border-radius:1em}
-.g.sel::before{content:"";position:absolute;left:-.9em;width:.3em;height:1.7em;background:#fff;border-radius:0 .3em .3em 0}
-.pv-channels{display:flex;flex-direction:column;background:var(--p-card);padding-top:.2em}
-.pv-ch-head{padding:.9em .9em;font-weight:700;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:.4em}
-.cat{font-size:.78em;text-transform:uppercase;letter-spacing:.07em;color:var(--p-muted);margin:.9em .9em .3em}
-.ch{display:flex;gap:.45em;align-items:center;padding:.42em .7em;margin:0 .45em;border-radius:.4em;color:var(--p-muted);transition:background var(--p-speed) var(--p-ease),color var(--p-speed) var(--p-ease)}
-.ch::before{content:"#";opacity:.7}
+.pv-app,.pv-menu,.pv-modal{font-size:clamp(6px,1.1cqw,16px)}
+.pv-app{position:absolute;inset:0;display:flex;flex-direction:column;line-height:1.35}
+.pv .ic{width:1.25em;height:1.25em;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.pv .ic.sm{width:1em;height:1em}
+.pv b{font-weight:600}
+.pv .grow{flex:1;min-width:0}
+.view-home :is(.v-server,.v-dm):not(.v-home),.view-server :is(.v-home,.v-dm):not(.v-server),.view-dm :is(.v-home,.v-server):not(.v-dm){display:none!important}
+.view-home .sel-home,.view-dm .sel-dm{background:var(--p-sel);color:#fff}
+
+/* title bar */
+.tb{position:relative;flex:none;height:2.2em;display:flex;align-items:center;justify-content:center;font-size:.8em;font-weight:600;color:var(--p-muted)}
+.tb-t{display:flex;align-items:center;gap:.45em}
+.tb-ico{width:1.2em;height:1.2em;border-radius:.3em;overflow:hidden;color:transparent;line-height:1.2em}
+.tb-r{position:absolute;right:1em;display:flex;gap:.9em}
+
+/* layout */
+.pv-body{flex:1;min-height:0;display:grid;grid-template-columns:4.5em 15em 1fr}
+
+/* server rail */
+.rail{display:flex;flex-direction:column;align-items:center;gap:.5em;padding-top:.15em;overflow:hidden}
+.g{position:relative;flex:none;width:2.5em;height:2.5em;border-radius:.75em;display:grid;place-items:center;font-weight:600;color:#fff;transition:border-radius var(--p-speed) var(--p-ease),background var(--p-speed) var(--p-ease)}
+.g:hover{border-radius:.95em}
+.g.home,.g.act{background:var(--p-card);color:var(--p-text)}
+.view-home .g.sel-home,.view-dm .g.sel-dm{background:var(--p-main);color:#fff}
+.view-server .g.sel-server::before,.view-home .g.sel-home::before,.view-dm .g.sel-dm::before,.g.unread-g::before{content:"";position:absolute;left:-1em;width:.25em;height:2.5em;background:#fff;border-radius:0 .25em .25em 0}
+.g.unread-g::before{height:.5em}
+.rsep{flex:none;width:2em;height:1px;background:rgba(255,255,255,.1)}
+
+/* channel / DM sidebar */
+.side{position:relative;min-width:0;overflow:hidden;background:var(--p-card);border-top-left-radius:.6em;border-top:1px solid rgba(255,255,255,.05);border-left:1px solid rgba(255,255,255,.05)}
+.side-in{display:flex;flex-direction:column;gap:.1em;padding:.5em .5em 5em;height:100%}
+.find{margin:0 0 .5em;padding:.45em .6em;border-radius:.5em;background:var(--p-input);font-size:.8em;font-weight:600;text-align:center;color:var(--p-muted)}
+.nav{display:flex;align-items:center;gap:.7em;padding:.5em .6em;border-radius:.5em;color:var(--p-muted);font-weight:500;transition:background var(--p-speed) var(--p-ease),color var(--p-speed) var(--p-ease)}
+.nav:hover{background:rgba(255,255,255,.05);color:var(--p-text)}
+.nbadge{margin-left:auto;font-size:.6em;font-weight:700;background:#fff;color:#000;border-radius:.4em;padding:.1em .5em}
+.dmh{display:flex;justify-content:space-between;align-items:center;margin:.9em .6em .3em;font-size:.8em;color:var(--p-muted)}
+.dmr{display:flex;align-items:center;gap:.7em;padding:.35em .6em;border-radius:.5em;color:var(--p-muted);transition:background var(--p-speed) var(--p-ease),color var(--p-speed) var(--p-ease)}
+.dmr:hover{background:rgba(255,255,255,.05);color:var(--p-text)}
+.dmr.off,.mr.off{opacity:.45}
+.nm{font-weight:500;line-height:1.25}
+.sub{display:flex;align-items:center;gap:.3em;font-size:.75em;color:var(--p-muted)}
+.tag{display:inline-block;font-size:.6em;font-weight:700;padding:.1em .4em;border-radius:.3em;background:rgba(255,255,255,.1);color:var(--p-text);vertical-align:.15em;margin-left:.3em}
+.banner{height:7em;margin:-.5em -.5em .5em;padding:.9em;background:linear-gradient(160deg,color-mix(in srgb,var(--p-main) 55%,#000),#0b0b10 85%)}
+.sname{display:inline-flex;align-items:center;gap:.3em;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.cat{display:flex;align-items:center;gap:.2em;margin:.9em .4em .2em;font-size:.75em;font-weight:600;color:var(--p-muted)}
+.ch{display:flex;align-items:center;gap:.5em;padding:.38em .6em;border-radius:.4em;color:var(--p-muted);transition:background var(--p-speed) var(--p-ease),color var(--p-speed) var(--p-ease)}
 .ch:hover{background:rgba(255,255,255,.05);color:var(--p-text)}
 .ch.sel{background:var(--p-sel);color:#fff}
 .ch.unread{color:var(--p-unread);font-weight:600}
 .ch.muted{opacity:.45}
-.pv-user{margin-top:auto;display:flex;align-items:center;gap:.6em;padding:.7em .8em;border-top:1px solid rgba(255,255,255,.06)}
-.av{position:relative;flex:none;width:2.5em;height:2.5em;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.95em;color:#fff}
-.st{position:absolute;right:-.1em;bottom:-.1em;width:.85em;height:.85em;border-radius:50%;border:.18em solid #0b0b0d}
-.pv-chat{display:flex;flex-direction:column;min-width:0}
-.pv-top{display:flex;align-items:center;gap:.5em;height:3.3em;padding:0 1.1em;font-weight:700;border-bottom:1px solid rgba(255,255,255,.06)}
-.pv-top span{color:var(--p-muted);font-weight:400}
-.msgs{flex:1;padding:.8em 1.1em;display:flex;flex-direction:column;gap:.55em;overflow:hidden}
-.msg{display:flex;gap:.8em;padding:.35em .5em;border-radius:.3em;transition:background var(--p-speed) var(--p-ease)}
-.msg:hover{background:rgba(255,255,255,.025)}
-.msg b{font-weight:600}
-.msg time{font-size:.78em;color:var(--p-muted);margin-left:.5em}
-.msg.ment{background:color-mix(in srgb,var(--p-main) 12%,transparent);box-shadow:inset .2em 0 var(--p-main)}
-.msg a{color:var(--p-main);text-decoration:none}
-.msg .men{background:color-mix(in srgb,var(--p-main) 28%,transparent);color:#fff;border-radius:.25em;padding:0 .25em}
-.code{margin-top:.35em;display:inline-block;background:var(--p-input);border-radius:.35em;padding:.4em .7em;font-family:var(--p-code);font-size:.92em}
-.pv-input{margin:.4em 1.1em 1em;padding:.8em 1em;background:var(--p-input);border-radius:var(--p-radius);color:var(--p-muted);transition:box-shadow var(--p-speed) var(--p-ease)}
-.pv-input:hover{box-shadow:0 0 0 1px rgba(255,255,255,.16)}
-.pv-members{padding:.9em .7em;background:var(--p-card)}
-.mem-h{font-size:.78em;text-transform:uppercase;letter-spacing:.07em;color:var(--p-muted);margin:.5em .5em .4em}
-.mem{display:flex;align-items:center;gap:.65em;padding:.32em .5em;border-radius:.4em;transition:background var(--p-speed) var(--p-ease)}
-.mem:hover{background:rgba(255,255,255,.05)}
-.mem.off{opacity:.5}
-.pv-menu{display:none;position:absolute;left:34%;top:34%;min-width:15em;padding:.4em;background:var(--p-popout);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));border:1px solid var(--p-border);border-radius:var(--p-radius);font-size:clamp(7px,1.25cqw,15px);box-shadow:0 8px 30px rgba(0,0,0,.4);transform-origin:top left;animation:rise var(--p-speed) var(--p-ease) both}
-.scene-menu .pv-menu{display:block}
-.mi{padding:.5em .8em;border-radius:calc(var(--p-radius) * .5);transition:background var(--p-speed) var(--p-ease)}
+.newb{margin-left:auto;font-size:.6em;font-weight:700;color:var(--p-main)}
+.vbadge{display:inline-flex;align-self:flex-start;align-items:center;gap:.4em;margin:.3em .6em;padding:.15em .55em;border-radius:1em;font-size:.65em;font-weight:700;color:var(--p-online);background:color-mix(in srgb,var(--p-online) 15%,transparent)}
+.vdot{width:.6em;height:.6em;border-radius:50%;background:currentColor}
+
+/* avatars and status */
+.av{position:relative;flex:none;width:2em;height:2em;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff}
+.av.xs{width:2em;height:2em;font-size:.6em}
+.av.xl{width:3.2em;height:3.2em;font-size:1.6em}
+.st{position:absolute;right:-.15em;bottom:-.15em;width:.75em;height:.75em;border-radius:50%;border:.2em solid #111}
+
+/* main column */
+.mainv{display:flex;flex-direction:column;min-width:0;min-height:0}
+.hd{flex:none;height:3em;display:flex;align-items:center;gap:.75em;padding:0 1em;border-bottom:1px solid rgba(255,255,255,.06);color:var(--p-muted);white-space:nowrap;overflow:hidden}
+.hd-t{display:flex;align-items:center;gap:.5em;font-weight:600;color:var(--p-text)}
+.hdot{width:.25em;height:.25em;border-radius:50%;background:var(--p-muted)}
+.tab-p{padding:.2em .6em;border-radius:.4em;font-weight:500}
+.tab-p.on{background:rgba(255,255,255,.08);color:var(--p-text)}
+.btn-acc{padding:.25em .7em;border-radius:.4em;background:var(--p-main);color:#fff;font-weight:600;font-size:.9em;transition:background var(--p-speed) var(--p-ease)}
+.btn-acc:hover{background:var(--p-hover)}
+.pill{padding:.15em .6em;border-radius:.4em;background:rgba(255,255,255,.08);color:var(--p-text);font-size:.85em}
+.topic{font-size:.8em;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.hsearch{flex:none;display:flex;align-items:center;justify-content:space-between;gap:.5em;width:12em;padding:.3em .6em;border-radius:.4em;background:var(--p-input);font-size:.8em}
+.split{flex:1;min-height:0;display:grid}
+.split.rp-wide{grid-template-columns:1fr 21em}
+.split.rp-mem{grid-template-columns:1fr 15em}
+.rp{min-width:0;overflow:hidden;background:var(--p-card);border-left:1px solid rgba(255,255,255,.05);padding:1em}
+
+/* home: friends + active now */
+.fl{padding:.8em 1.4em;display:flex;flex-direction:column;min-width:0}
+.search{display:flex;align-items:center;gap:.5em;padding:.5em .7em;border-radius:.5em;background:var(--p-input);color:var(--p-muted);font-size:.9em}
+.sublbl{margin:1.2em 0 .6em;font-size:.75em;font-weight:600;color:var(--p-muted)}
+.fr{display:flex;align-items:center;gap:.8em;padding:.6em .5em;border-top:1px solid rgba(255,255,255,.06);border-radius:.5em;transition:background var(--p-speed) var(--p-ease)}
+.fr:hover{background:rgba(255,255,255,.04)}
+.fr .av{width:2.2em;height:2.2em}
+.cbtn{flex:none;width:2.2em;height:2.2em;border-radius:50%;display:grid;place-items:center;background:var(--p-input);color:var(--p-muted)}
+.rp h5{margin:0 0 .8em;font-size:1.1em}
+.anc{border-radius:.6em;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05);overflow:hidden}
+.anr{display:flex;align-items:center;gap:.7em;padding:.7em}
+.anr.inner{border-top:1px solid rgba(255,255,255,.05);background:rgba(0,0,0,.15)}
+.anr>.ic{color:var(--p-online)}
+.art{flex:none;width:2.2em;height:2.2em;border-radius:.3em;background:linear-gradient(135deg,#2a2f45,#6b4f8f)}
+
+/* chat */
+.chat{display:flex;flex-direction:column;min-width:0;min-height:0}
+.msgs{flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;padding:.5em 0}
+.div{display:flex;align-items:center;gap:.6em;margin:.8em 1em;font-size:.72em;font-weight:600;color:var(--p-muted)}
+.div::before,.div::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.08)}
+.msg{position:relative;flex:none;display:flex;gap:1em;padding:.3em 1em;transition:background var(--p-speed) var(--p-ease)}
+.msg:hover,.msg.hov{background:rgba(255,255,255,.025)}
+.msg>.av{width:2.5em;height:2.5em}
+.mb{min-width:0}
+.mh{display:flex;align-items:baseline;gap:.4em}
+.mh time{font-size:.72em;color:var(--p-muted)}
+.pv a{color:var(--p-main);text-decoration:none}
+.msg.ment{background:color-mix(in srgb,var(--p-main) 10%,transparent);box-shadow:inset .15em 0 var(--p-main)}
+.men{background:color-mix(in srgb,var(--p-main) 28%,transparent);color:#fff;border-radius:.25em;padding:0 .2em;font-weight:500}
+.embed{margin-top:.4em;max-width:26em;padding:.6em .9em;border-radius:.3em;background:var(--p-card);border-left:.25em solid var(--p-main);display:flex;flex-direction:column;gap:.25em}
+.es{font-size:.72em;color:var(--p-muted)}
+.embed a{font-weight:600}
+.ed{font-size:.85em}
+.reacts{display:flex;gap:.3em;margin-top:.4em;flex-wrap:wrap}
+.re{display:inline-flex;align-items:center;gap:.35em;padding:.15em .5em;border-radius:.5em;background:var(--p-card);border:1px solid transparent;font-size:.85em}
+.re.me{background:color-mix(in srgb,var(--p-main) 15%,transparent);border-color:var(--p-main)}
+.re.add{color:var(--p-muted)}
+.code{margin-top:.35em;display:inline-block;background:var(--p-input);border-radius:.35em;padding:.4em .7em;font-family:var(--p-code);font-size:.9em}
+.composer{flex:none;display:flex;align-items:center;gap:.9em;margin:0 1em 1em;padding:0 1em;height:2.9em;border-radius:var(--p-radius);background:var(--p-input);color:var(--p-muted);transition:box-shadow var(--p-speed) var(--p-ease)}
+.composer:hover{box-shadow:0 0 0 1px rgba(255,255,255,.16)}
+.composer .grow{white-space:nowrap;overflow:hidden}
+
+/* member list */
+.mem{padding:.6em .5em}
+.mg{margin:1em .5em .3em;font-size:.75em;font-weight:600;color:var(--p-muted)}
+.mg:first-child{margin-top:.2em}
+.mr{display:flex;align-items:center;gap:.7em;padding:.3em .5em;border-radius:.4em;transition:background var(--p-speed) var(--p-ease)}
+.mr:hover{background:rgba(255,255,255,.05)}
+
+/* direct message */
+.dmstart{flex:none;padding:1em 1em .5em}
+.dmstart h3{margin:.3em 0 0;font-size:1.9em;line-height:1.2}
+.uname{font-size:1.3em;font-weight:500;margin-bottom:.4em}
+.dmstart p{margin:.3em 0 .6em;color:var(--p-muted);font-size:.9em}
+.dmstart p b{color:var(--p-text)}
+.dmrow{display:flex;align-items:center;gap:.6em}
+.gb{display:inline-block;padding:.3em .8em;border-radius:.4em;background:rgba(255,255,255,.08);color:var(--p-text);font-size:.8em;font-weight:500;text-align:center}
+.gb.wide{display:block;padding:.6em}
+.sys{flex:none;display:flex;align-items:center;gap:.6em;padding:.3em 1.5em;color:var(--p-muted);font-size:.9em}
+.sys>.ic{color:var(--p-success)}
+.sys b{color:var(--p-text)}
+.sys time{font-size:.8em}
+.tbar{position:absolute;right:1em;top:-1em;display:flex;align-items:center;gap:.55em;padding:.3em .55em;border-radius:.5em;background:var(--p-popout);border:1px solid var(--p-border);color:var(--p-muted);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));animation:fade var(--p-speed) var(--p-ease) both;font-size:.95em}
+.tbar i{width:1px;height:1em;background:rgba(255,255,255,.12)}
+.invite{margin-top:.4em;width:15em;border-radius:.5em;overflow:hidden;background:var(--p-card);border:1px solid rgba(255,255,255,.06)}
+.ib{height:3.2em;background:linear-gradient(135deg,#7a1f2b,#2a0d12)}
+.ii{position:relative;padding:1.8em .9em .9em;display:flex;flex-direction:column;gap:.25em}
+.iicon{position:absolute;top:-1.6em;left:.9em;width:3em;height:3em;border-radius:.8em;background:#7a3f5e;border:.2em solid #111;display:grid;place-items:center;font-weight:700;color:#fff}
+.sdot{display:inline-block;width:.55em;height:.55em;border-radius:50%;background:var(--p-offline);margin:0 .1em 0 .5em}
+.sdot.on{background:var(--p-online);margin-left:0}
+.gobtn{margin-top:.5em;padding:.45em;border-radius:.4em;background:var(--p-success);color:#fff;font-weight:600;font-size:.85em;text-align:center}
+.prof{display:flex;flex-direction:column;gap:.35em;padding:0 1em 1em}
+.pban{flex:none;height:5em;margin:0 -1em;background:linear-gradient(135deg,#2b3a55,#141820)}
+.prof .av.xl{margin-top:-1em;border:.12em solid #111}
+.prof h4{margin:.2em 0 0;font-size:1.25em}
+.badges{display:flex;gap:.3em;margin:.2em 0 .4em}
+.badges i{width:1em;height:1em;border-radius:.3em}
+.plbl{margin-top:.6em;font-size:.7em;font-weight:700}
+
+/* user panel (floats over the bottom of the rail and sidebar) */
+.upanel{position:absolute;left:.5em;bottom:.5em;width:18.5em;height:3.4em;display:flex;align-items:center;gap:.6em;padding:0 .7em;border-radius:.6em;background:var(--p-popout);border:1px solid var(--p-border);color:var(--p-muted)}
+.upanel .nm{color:var(--p-text)}
+
+/* overlays */
+.pv-menu{display:none;position:absolute;left:21%;top:22%;min-width:14em;padding:.4em;background:var(--p-popout);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));border:1px solid var(--p-border);border-radius:var(--p-radius);box-shadow:0 8px 30px rgba(0,0,0,.45);color:var(--p-text);transform-origin:top left;animation:rise var(--p-speed) var(--p-ease) both}
+.ov-menu .pv-menu{display:block}
+.mi{display:flex;align-items:center;justify-content:space-between;gap:1em;padding:.45em .6em;border-radius:calc(var(--p-radius) * .5);font-size:.9em;transition:background var(--p-speed) var(--p-ease)}
 .mi:hover{background:rgba(255,255,255,.08)}
+.mi .r{transform:rotate(-90deg)}
 .mi.danger{color:var(--p-danger)}
-.msep{height:1px;background:rgba(255,255,255,.08);margin:.35em .4em}
+.msep{height:1px;background:rgba(255,255,255,.08);margin:.3em .4em}
 .pv-wrap{display:none;position:absolute;inset:0;place-items:center;background:rgba(0,0,0,.55);animation:fade var(--p-speed) var(--p-ease) both}
-.scene-window .pv-wrap{display:grid}
-.pv-modal{width:min(62%,34em);padding:1.5em;background:var(--p-modal);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));border:1px solid var(--p-border);border-radius:var(--p-radius);font-size:clamp(7px,1.25cqw,15px);animation:rise var(--p-speed) var(--p-ease) both}
+.ov-window .pv-wrap{display:grid}
+.pv-modal{width:min(62%,34em);padding:1.5em;background:var(--p-modal);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));border:1px solid var(--p-border);border-radius:var(--p-radius);color:var(--p-text);animation:rise var(--p-speed) var(--p-ease) both}
 .pv-modal h4{margin:0 0 1em;font-size:1.3em}
 .mrow{display:flex;justify-content:space-between;align-items:center;padding:.7em 0;border-bottom:1px solid rgba(255,255,255,.06)}
 .sw{width:2.7em;height:1.5em;border-radius:1em;background:rgba(255,255,255,.18);position:relative;transition:background var(--p-speed) var(--p-ease)}
@@ -139,11 +264,9 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 .pb:hover{background:var(--p-hover)}
 .pb.ghost{background:rgba(255,255,255,.08)}
 .pb.red{background:var(--p-danger)}
-.pb.green{background:var(--p-success)}
 @keyframes rise{from{opacity:0;transform:translateY(4px) scale(.98)}to{opacity:1;transform:none}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
-@container pv (max-width:560px){.pv-members{display:none}.pv-app{grid-template-columns:4.4em 1fr}.pv-channels{display:none}}
-@container pv (min-width:561px) and (max-width:760px){.pv-members{display:none}.pv-app{grid-template-columns:4.8em 14.5em 1fr}}
+@container pv (max-width:700px){.split.rp-wide,.split.rp-mem{grid-template-columns:1fr}.split>.rp{display:none}.hsearch,.topic{display:none}}
 
 @media (max-width:900px){
   body{overflow:auto;height:auto}
@@ -156,6 +279,47 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-friends" viewBox="0 0 16 16"><circle cx="6" cy="5" r="2.5"/><path d="M1.5 13.5c0-2.6 2-4.3 4.5-4.3s4.5 1.7 4.5 4.3"/><path d="M11 3a2.3 2.3 0 0 1 0 4.4M12.6 9.4c1.2.6 1.9 1.9 1.9 3.6"/></symbol>
+  <symbol id="i-nitro" viewBox="0 0 16 16"><circle cx="9" cy="8" r="5"/><path d="M1.5 6h3M1 9h3.5M2 12h3"/></symbol>
+  <symbol id="i-shop" viewBox="0 0 16 16"><path d="M3 5.5h10l-.8 8.5H3.8z"/><path d="M5.5 5.5V4a2.5 2.5 0 0 1 5 0v1.5"/></symbol>
+  <symbol id="i-quest" viewBox="0 0 16 16"><path d="M8 1.8 14.2 8 8 14.2 1.8 8z"/><path d="M8 5.2v5.6M5.2 8h5.6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 16 16"><path d="M8 3v10M3 8h10"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="m10.6 5.4-1.6 3.6-3.6 1.6 1.6-3.6z"/></symbol>
+  <symbol id="i-download" viewBox="0 0 16 16"><path d="M8 2.5v8M4.5 7.5 8 11l3.5-3.5M3 13.5h10"/></symbol>
+  <symbol id="i-hash" viewBox="0 0 16 16"><path d="M6.2 2.5 5 13.5M11.2 2.5 10 13.5M2.8 6h11M2.2 10h11"/></symbol>
+  <symbol id="i-mega" viewBox="0 0 16 16"><path d="M2.5 6.2v3.6h2.2l5.3 3V3.2L4.7 6.2z"/><path d="M12.2 6a2.6 2.6 0 0 1 0 4"/><path d="M5 10l.8 3.3"/></symbol>
+  <symbol id="i-speaker" viewBox="0 0 16 16"><path d="M2.5 6v4h2.5l4 3V3L5 6z"/><path d="M11.5 5.5a3.5 3.5 0 0 1 0 5"/></symbol>
+  <symbol id="i-forum" viewBox="0 0 16 16"><path d="M2.5 3h8v6h-5l-3 2.5z"/><path d="M12.5 6h1v6.5l-2-1.5h-4.5v-1"/></symbol>
+  <symbol id="i-list" viewBox="0 0 16 16"><path d="M5.5 4h8M5.5 8h8M5.5 12h8M2.5 4h.1M2.5 8h.1M2.5 12h.1"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 16 16"><path d="m4.5 6.5 3.5 3.5 3.5-3.5"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 16 16"><rect x="5.8" y="1.8" width="4.4" height="7.6" rx="2.2"/><path d="M3.3 7.5a4.7 4.7 0 0 0 9.4 0M8 12.3v2"/></symbol>
+  <symbol id="i-head" viewBox="0 0 16 16"><path d="M2.5 10.5V8a5.5 5.5 0 0 1 11 0v2.5"/><rect x="2" y="9.5" width="3" height="4.5" rx="1"/><rect x="11" y="9.5" width="3" height="4.5" rx="1"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 16 16"><circle cx="8" cy="8" r="2.3"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M3.4 12.6l1.4-1.4M11.2 4.8l1.4-1.4"/></symbol>
+  <symbol id="i-search" viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.3"/><path d="m10.2 10.2 3.3 3.3"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 16 16"><path d="M4 11V7a4 4 0 0 1 8 0v4l1.2 1.5H2.8z"/><path d="M6.5 14a1.6 1.6 0 0 0 3 0"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 16 16"><path d="m9.5 2 4.5 4.5-2 1-2.6 2.6.5 2.6-1.1 1.1-6.1-6.1 1.1-1.1 2.6.5L9 4.5z"/><path d="M5 11 2 14"/></symbol>
+  <symbol id="i-members" viewBox="0 0 16 16"><circle cx="6" cy="5.5" r="2.3"/><path d="M2 13.5c0-2.3 1.8-4 4-4s4 1.7 4 4"/><circle cx="11.5" cy="6" r="1.8"/><path d="M11 9.6c1.9 0 3.2 1.5 3.2 3.6"/></symbol>
+  <symbol id="i-thread" viewBox="0 0 16 16"><path d="M2.5 3h11v7.5H8l-3 2.5v-2.5H2.5z"/><path d="M5 6h6M5 8h3.5"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 16 16"><path d="M4 2.5h2.2l1 3-1.5 1a7 7 0 0 0 3.8 3.8l1-1.5 3 1V12a1.5 1.5 0 0 1-1.5 1.5A10.5 10.5 0 0 1 2.5 4 1.5 1.5 0 0 1 4 2.5z"/></symbol>
+  <symbol id="i-video" viewBox="0 0 16 16"><rect x="1.8" y="4" width="8.7" height="8" rx="1.5"/><path d="m10.5 7 3.7-2v6l-3.7-2"/></symbol>
+  <symbol id="i-adduser" viewBox="0 0 16 16"><circle cx="6.5" cy="5.5" r="2.5"/><path d="M2 13.5c0-2.5 2-4.2 4.5-4.2 1 0 1.9.3 2.6.7M12.5 9v5M10 11.5h5"/></symbol>
+  <symbol id="i-profile" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="6.8" r="2"/><path d="M4.3 12.3c.8-1.4 2.1-2.3 3.7-2.3s2.9.9 3.7 2.3"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 16 16"><path d="M2.5 9.5 4 3.5h8l1.5 6v3.5h-11z"/><path d="M2.5 9.5h3l1 1.5h3l1-1.5h3"/></symbol>
+  <symbol id="i-help" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M6.3 6.3a1.8 1.8 0 1 1 2.4 1.7c-.5.2-.7.6-.7 1.1v.4M8 11.6v.1"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 16 16"><rect x="2.5" y="6" width="11" height="7.5" rx="1"/><path d="M2 6h12M8 6v7.5M8 6C6.5 3 4.5 3.5 5 5s3 1 3 1 2.5.5 3-1-1.5-2-3 1"/></symbol>
+  <symbol id="i-gif" viewBox="0 0 16 16"><rect x="1.8" y="3.5" width="12.4" height="9" rx="2"/><path d="M6.3 6.5H5v3h1.3V8.2M8.5 6.5v3M10.5 9.5v-3h1.7M10.5 8h1.3"/></symbol>
+  <symbol id="i-sticker" viewBox="0 0 16 16"><path d="M3 2.5h10v6.5l-4 4.5H3z"/><path d="M9 13.5V9h4"/></symbol>
+  <symbol id="i-emoji" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M5.5 9.5a3 3 0 0 0 5 0M6 6.5v.1M10 6.5v.1"/></symbol>
+  <symbol id="i-apps" viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 16 16"><path d="M2.5 3h11v7.5H7l-3 2.5v-2.5H2.5z"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 16 16"><path d="M8 3.5v.1M8 8v.1M8 12.5v.1" stroke-width="2.2"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 16 16"><path d="M6.5 4 3 7.5 6.5 11"/><path d="M3.5 7.5H10a3.5 3.5 0 0 1 3.5 3.5v1"/></symbol>
+  <symbol id="i-forward" viewBox="0 0 16 16"><path d="M9.5 4 13 7.5 9.5 11"/><path d="M12.5 7.5H6A3.5 3.5 0 0 0 2.5 11v1"/></symbol>
+  <symbol id="i-music" viewBox="0 0 16 16"><path d="M6 12V3.5l7-1.5v8.5"/><circle cx="4.5" cy="12" r="1.5"/><circle cx="11.5" cy="10.5" r="1.5"/></symbol>
+  <symbol id="i-game" viewBox="0 0 16 16"><rect x="1.8" y="5" width="12.4" height="7" rx="3.5"/><path d="M5 7.3v2.4M3.8 8.5h2.4M10.5 8h.1M12 9.5h.1"/></symbol>
+  <symbol id="i-bubble" viewBox="0 0 16 16"><path d="M3 4.5A2.5 2.5 0 0 1 5.5 2h5A2.5 2.5 0 0 1 13 4.5v4a2.5 2.5 0 0 1-2.5 2.5H7.3L4.5 13.5V11A2.5 2.5 0 0 1 3 8.7z" fill="currentColor" stroke="none"/></symbol>
+</svg>
 <header class="top">
   <div class="brand"><span class="logo">INTOX</span><span class="badge">EDITOR</span></div>
   <label>Discord theme
@@ -191,61 +355,220 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
             <option value="1/1">Square 1:1</option>
           </select>
         </label>
-        <label>Show
-          <select id="scene" aria-label="Preview scene">
-            <option value="menu">Chat and menu</option>
-            <option value="chat">Chat only</option>
+        <label>View
+          <select id="view" aria-label="Preview view">
+            <option value="home">Home (friends)</option>
+            <option value="server">Server</option>
+            <option value="dm">Direct message</option>
+          </select>
+        </label>
+        <label>Overlay
+          <select id="scene" aria-label="Preview overlay">
+            <option value="none">None</option>
+            <option value="menu">Right-click menu</option>
             <option value="window">Settings window</option>
           </select>
         </label>
         <span>Try different window shapes to see how the background fits.</span>
       </div>
       <div id="stageBody">
-        <div class="pv scene-menu" id="frame">
+        <div class="pv view-server ov-none" id="frame">
           <div class="pv-fill" id="pvfill"></div>
           <div class="pv-bg" id="pvbg"></div>
           <div class="pv-shade" id="pvshade"></div>
-          <div class="pv-app">
-            <nav class="pv-guilds" aria-hidden="true">
-              <div class="g sel">IN</div><div class="g">GD</div><div class="g">BD</div><div class="g">+</div>
-            </nav>
-            <div class="pv-channels" aria-hidden="true">
-              <div class="pv-ch-head">INTOX</div>
-              <div class="cat">Information</div>
-              <div class="ch">rules</div>
-              <div class="ch unread">announcements</div>
-              <div class="cat">Text</div>
-              <div class="ch sel">general</div>
-              <div class="ch">showcase</div>
-              <div class="ch muted">off-topic</div>
-              <div class="pv-user"><div class="av" style="background:#5865a0">Y<span class="st" data-st="online"></span></div><div><b>you</b><div class="hint" style="color:var(--p-muted);font-size:.85em">online</div></div></div>
+          <div class="pv-app" aria-hidden="true">
+            <div class="tb">
+              <span class="tb-t v-home"><svg class="ic"><use href="#i-friends"/></svg>Friends</span>
+              <span class="tb-t v-server"><span class="tb-ico" style="background:#3d4f8f">IL</span>INTOX Lounge</span>
+              <span class="tb-t v-dm"><svg class="ic"><use href="#i-chat"/></svg>Direct Messages</span>
+              <span class="tb-r"><svg class="ic"><use href="#i-inbox"/></svg><svg class="ic"><use href="#i-help"/></svg></span>
             </div>
-            <main class="pv-chat" aria-hidden="true">
-              <div class="pv-top">#&nbsp;general <span>Talk about anything</span></div>
-              <div class="msgs">
-                <div class="msg"><div class="av" style="background:#7a5cc0">N</div><div><b>Nova</b><time>Today 12:04</time><div>Just switched to INTOX. The black looks perfect.</div></div></div>
-                <div class="msg"><div class="av" style="background:#3f8f7a">K</div><div><b>Kit</b><time>Today 12:05</time><div>Same. Try the <a>accent presets</a> in the editor.</div></div></div>
-                <div class="msg ment"><div class="av" style="background:#c0563f">M</div><div><b>Mira</b><time>Today 12:06</time><div><span class="men">@you</span> the new build is live.</div><div class="code">--main-color: #4a6cf7;</div></div></div>
-              </div>
-              <div class="pv-input">Message #general</div>
-            </main>
-            <aside class="pv-members" aria-hidden="true">
-              <div class="mem-h">Online - 4</div>
-              <div class="mem"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div>Nova</div>
-              <div class="mem"><div class="av" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div>Kit</div>
-              <div class="mem"><div class="av" style="background:#c0563f">M<span class="st" data-st="dnd"></span></div>Mira</div>
-              <div class="mem"><div class="av" style="background:#4f6fb0">J<span class="st" data-st="streaming"></span></div>Juno</div>
-              <div class="mem-h">Offline - 1</div>
-              <div class="mem off"><div class="av" style="background:#555">R<span class="st" data-st="offline"></span></div>Rex</div>
-            </aside>
+            <div class="pv-body">
+              <nav class="rail">
+                <div class="g home sel-home sel-dm"><svg class="ic"><use href="#i-bubble"/></svg></div>
+                <div class="rsep"></div>
+                <div class="g sel-server" style="background:#3d4f8f">IL</div>
+                <div class="g unread-g" style="background:#7a3f5e">NO</div>
+                <div class="g" style="background:#3f7a5e">GD</div>
+                <div class="g" style="background:#7a6a3f">AR</div>
+                <div class="g" style="background:#4f3f7a">PX</div>
+                <div class="g act"><svg class="ic"><use href="#i-plus"/></svg></div>
+                <div class="g act"><svg class="ic"><use href="#i-compass"/></svg></div>
+                <div class="g act"><svg class="ic"><use href="#i-download"/></svg></div>
+              </nav>
+
+              <aside class="side">
+                <div class="side-in v-home v-dm">
+                  <div class="find">Find or start a conversation</div>
+                  <div class="nav sel-home"><svg class="ic"><use href="#i-friends"/></svg>Friends</div>
+                  <div class="nav"><svg class="ic"><use href="#i-nitro"/></svg>Nitro<span class="nbadge">NEW</span></div>
+                  <div class="nav"><svg class="ic"><use href="#i-shop"/></svg>Shop</div>
+                  <div class="nav"><svg class="ic"><use href="#i-quest"/></svg>Quests</div>
+                  <div class="dmh">Direct Messages<svg class="ic"><use href="#i-plus"/></svg></div>
+                  <div class="dmr"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div><div><div class="nm">Nova</div><div class="sub"><svg class="ic sm"><use href="#i-music"/></svg>Glass Avenue</div></div></div>
+                  <div class="dmr sel-dm"><div class="av" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div><div><div class="nm">Kit <span class="tag">INTX</span></div></div></div>
+                  <div class="dmr"><div class="av" style="background:#c0563f">M<span class="st" data-st="dnd"></span></div><div><div class="nm">Mira</div><div class="sub">brb, making tea</div></div></div>
+                  <div class="dmr"><div class="av" style="background:#4f6fb0">J<span class="st" data-st="streaming"></span></div><div><div class="nm">Juno</div></div></div>
+                  <div class="dmr off"><div class="av" style="background:#555a66">R<span class="st" data-st="offline"></span></div><div><div class="nm">Rex</div></div></div>
+                </div>
+                <div class="side-in v-server">
+                  <div class="banner"><span class="sname">INTOX Lounge<svg class="ic sm"><use href="#i-chev"/></svg></span></div>
+                  <div class="nav"><svg class="ic"><use href="#i-list"/></svg>Channels &amp; Roles</div>
+                  <div class="cat">Information<svg class="ic sm"><use href="#i-chev"/></svg></div>
+                  <div class="ch sel"><svg class="ic"><use href="#i-mega"/></svg>announcements</div>
+                  <div class="ch"><svg class="ic"><use href="#i-hash"/></svg>rules</div>
+                  <div class="cat">General<svg class="ic sm"><use href="#i-chev"/></svg></div>
+                  <div class="ch unread"><svg class="ic"><use href="#i-hash"/></svg>general<span class="newb">2 NEW</span></div>
+                  <div class="ch"><svg class="ic"><use href="#i-hash"/></svg>media</div>
+                  <div class="ch"><svg class="ic"><use href="#i-forum"/></svg>showcase</div>
+                  <div class="ch muted"><svg class="ic"><use href="#i-hash"/></svg>off-topic</div>
+                  <div class="cat">Voice<svg class="ic sm"><use href="#i-chev"/></svg></div>
+                  <div class="ch"><svg class="ic"><use href="#i-speaker"/></svg>Lounge</div>
+                  <div class="vbadge"><span class="vdot"></span>3 IN VOICE</div>
+                </div>
+              </aside>
+
+              <main class="mainv v-home">
+                <header class="hd">
+                  <span class="hd-t"><svg class="ic"><use href="#i-friends"/></svg>Friends</span><span class="hdot"></span>
+                  <span class="tab-p on">Online</span><span class="tab-p">All</span><span class="btn-acc">Add Friend</span>
+                  <span class="grow"></span><svg class="ic"><use href="#i-chat"/></svg>
+                </header>
+                <div class="split rp-wide">
+                  <div class="fl">
+                    <div class="search"><svg class="ic sm"><use href="#i-search"/></svg>Search</div>
+                    <div class="sublbl">Online - 3</div>
+                    <div class="fr"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div><div class="grow"><div class="nm">Nova</div><div class="sub"><svg class="ic sm"><use href="#i-music"/></svg>Glass Avenue</div></div><span class="cbtn"><svg class="ic sm"><use href="#i-chat"/></svg></span><span class="cbtn"><svg class="ic sm"><use href="#i-dots"/></svg></span></div>
+                    <div class="fr"><div class="av" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div><div class="grow"><div class="nm">Kit <span class="tag">INTX</span></div><div class="sub">Idle</div></div><span class="cbtn"><svg class="ic sm"><use href="#i-chat"/></svg></span><span class="cbtn"><svg class="ic sm"><use href="#i-dots"/></svg></span></div>
+                    <div class="fr"><div class="av" style="background:#c0563f">M<span class="st" data-st="dnd"></span></div><div class="grow"><div class="nm">Mira</div><div class="sub">brb, making tea</div></div><span class="cbtn"><svg class="ic sm"><use href="#i-chat"/></svg></span><span class="cbtn"><svg class="ic sm"><use href="#i-dots"/></svg></span></div>
+                  </div>
+                  <aside class="rp">
+                    <h5>Active Now</h5>
+                    <div class="anc">
+                      <div class="anr"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div><div class="grow"><div class="nm">Nova</div><div class="sub">Listening to music</div></div><svg class="ic"><use href="#i-music"/></svg></div>
+                      <div class="anr inner"><div class="art"></div><div><div class="nm">Glass Avenue</div><div class="sub">Night Signals</div></div></div>
+                    </div>
+                  </aside>
+                </div>
+              </main>
+
+              <main class="mainv v-server">
+                <header class="hd">
+                  <svg class="ic"><use href="#i-mega"/></svg><span class="hd-t">announcements</span><span class="pill">Follow</span>
+                  <span class="topic">News and updates for the Lounge.</span>
+                  <span class="grow"></span>
+                  <svg class="ic"><use href="#i-thread"/></svg><svg class="ic"><use href="#i-bell"/></svg><svg class="ic"><use href="#i-pin"/></svg><svg class="ic"><use href="#i-members"/></svg>
+                  <span class="hsearch">Search INTOX Lounge<svg class="ic sm"><use href="#i-search"/></svg></span>
+                </header>
+                <div class="split rp-mem">
+                  <div class="chat">
+                    <div class="msgs">
+                      <div class="div"><span>October 24, 2026</span></div>
+                      <div class="msg"><div class="av" style="background:#c0563f">M</div><div class="mb">
+                        <div class="mh"><b style="color:#f0b232">Mira</b><span class="tag">INTX</span><time>10/24/26, 7:12 PM</time></div>
+                        <div>Version 1.0 of the theme is out. Patch notes are below.</div>
+                        <div class="embed"><div class="es">intox.example</div><a>INTOX 1.0: what's new</a><div class="ed">A black, minimal look with calm animations and a live editor.</div></div>
+                        <div class="reacts"><span class="re me">🔥<b>24</b></span><span class="re">👍<b>17</b></span><span class="re">❤️<b>9</b></span><span class="re add"><svg class="ic sm"><use href="#i-emoji"/></svg></span></div>
+                      </div></div>
+                      <div class="div"><span>Today</span></div>
+                      <div class="msg ment"><div class="av" style="background:#4f6fb0">J</div><div class="mb">
+                        <div class="mh"><b style="color:#57b0f0">Juno</b><time>Today at 2:05 PM</time></div>
+                        <div><span class="men">@you</span> the editor link is pinned in <a>#general</a>.</div>
+                      </div></div>
+                      <div class="msg"><div class="av" style="background:#b07a2f">S</div><div class="mb">
+                        <div class="mh"><b style="color:#4fd18b">Sol</b><time>Today at 2:07 PM</time></div>
+                        <div>Paste your settings into QuickCSS:</div>
+                        <div class="code">--main-color: #4a6cf7;</div>
+                      </div></div>
+                    </div>
+                    <div class="composer"><svg class="ic"><use href="#i-plus"/></svg><span class="grow">Message #announcements</span><svg class="ic"><use href="#i-gift"/></svg><svg class="ic"><use href="#i-gif"/></svg><svg class="ic"><use href="#i-sticker"/></svg><svg class="ic"><use href="#i-emoji"/></svg></div>
+                  </div>
+                  <aside class="rp mem">
+                    <div class="mg">Staff - 1</div>
+                    <div class="mr"><div class="av" style="background:#c0563f">M<span class="st" data-st="dnd"></span></div><div><div class="nm" style="color:#f0b232">Mira</div></div></div>
+                    <div class="mg">Moderators - 2</div>
+                    <div class="mr"><div class="av" style="background:#4f6fb0">J<span class="st" data-st="streaming"></span></div><div><div class="nm" style="color:#57b0f0">Juno</div><div class="sub">Streaming</div></div></div>
+                    <div class="mr"><div class="av" style="background:#b07a2f">S<span class="st" data-st="online"></span></div><div><div class="nm" style="color:#4fd18b">Sol</div></div></div>
+                    <div class="mg">Members - 3</div>
+                    <div class="mr"><div class="av" style="background:#7a5cc0">N<span class="st" data-st="online"></span></div><div><div class="nm">Nova</div><div class="sub"><svg class="ic sm"><use href="#i-music"/></svg>Glass Avenue</div></div></div>
+                    <div class="mr"><div class="av" style="background:#8a4f9e">W<span class="st" data-st="online"></span></div><div><div class="nm">Wren</div><div class="sub"><svg class="ic sm"><use href="#i-game"/></svg>Playing a game</div></div></div>
+                    <div class="mr off"><div class="av" style="background:#555a66">R<span class="st" data-st="offline"></span></div><div><div class="nm">Rex</div></div></div>
+                  </aside>
+                </div>
+              </main>
+
+              <main class="mainv v-dm">
+                <header class="hd">
+                  <div class="av xs" style="background:#3f8f7a">K</div><span class="hd-t">Kit</span>
+                  <span class="grow"></span>
+                  <svg class="ic"><use href="#i-phone"/></svg><svg class="ic"><use href="#i-video"/></svg><svg class="ic"><use href="#i-pin"/></svg><svg class="ic"><use href="#i-adduser"/></svg><svg class="ic"><use href="#i-profile"/></svg>
+                  <span class="hsearch">Search Kit<svg class="ic sm"><use href="#i-search"/></svg></span>
+                </header>
+                <div class="split rp-wide">
+                  <div class="chat">
+                    <div class="msgs">
+                      <div class="dmstart">
+                        <div class="av xl" style="background:#3f8f7a">K</div>
+                        <h3>Kit</h3><div class="uname">kit.wav</div>
+                        <p>This is the beginning of your direct message history with <b>Kit</b>.</p>
+                        <div class="dmrow"><span class="sub">2 Mutual Servers</span><span class="gb">Remove Friend</span><span class="gb">Block</span></div>
+                      </div>
+                      <div class="div"><span>October 11, 2026</span></div>
+                      <div class="sys"><svg class="ic"><use href="#i-adduser"/></svg><span>You accepted <b>Kit</b>'s friend request.</span><time>10/11/26</time></div>
+                      <div class="msg hov"><div class="av" style="background:#5865a0">Y</div><div class="mb">
+                        <div class="mh"><b>you</b><time>10/11/26, 2:21 PM</time></div>
+                        <div>just set up the new theme</div>
+                      </div>
+                        <div class="tbar"><span>👍</span><span>🔥</span><span>😂</span><i></i><svg class="ic sm"><use href="#i-emoji"/></svg><svg class="ic sm"><use href="#i-reply"/></svg><svg class="ic sm"><use href="#i-forward"/></svg><svg class="ic sm"><use href="#i-dots"/></svg></div>
+                      </div>
+                      <div class="msg"><div class="av" style="background:#3f8f7a">K</div><div class="mb">
+                        <div class="mh"><b>Kit</b><span class="tag">INTX</span><time>10/11/26, 2:25 PM</time></div>
+                        <div><a>invite.example/night-owls</a></div>
+                        <div class="invite">
+                          <div class="ib"></div>
+                          <div class="ii"><div class="iicon">NO</div><b>Night Owls</b>
+                            <div class="sub"><span class="sdot on"></span>30 Online <span class="sdot"></span>104 Members</div>
+                            <div class="sub">A late-night hangout for games and music.</div>
+                            <span class="gobtn">Go to Server</span></div>
+                        </div>
+                      </div></div>
+                      <div class="div"><span>Today</span></div>
+                      <div class="msg"><div class="av" style="background:#5865a0">Y</div><div class="mb"><div class="mh"><b>you</b><time>11:22 AM</time></div><div>looks so clean</div></div></div>
+                      <div class="msg"><div class="av" style="background:#3f8f7a">K</div><div class="mb"><div class="mh"><b>Kit</b><span class="tag">INTX</span><time>11:24 AM</time></div><div>agreed, the black is perfect</div></div></div>
+                    </div>
+                    <div class="composer"><svg class="ic"><use href="#i-plus"/></svg><span class="grow">Message @Kit</span><svg class="ic"><use href="#i-gift"/></svg><svg class="ic"><use href="#i-gif"/></svg><svg class="ic"><use href="#i-sticker"/></svg><svg class="ic"><use href="#i-emoji"/></svg><svg class="ic"><use href="#i-apps"/></svg></div>
+                  </div>
+                  <aside class="rp prof">
+                    <div class="pban"></div>
+                    <div class="av xl ring" style="background:#3f8f7a">K<span class="st" data-st="idle"></span></div>
+                    <h4>Kit</h4>
+                    <div class="sub">kit.wav <span class="tag">INTX</span></div>
+                    <div class="badges"><i style="background:#4fd18b"></i><i style="background:#57b0f0"></i><i style="background:#f0b232"></i><i style="background:#a07cf0"></i></div>
+                    <div class="sub">2 Mutual Servers</div>
+                    <div class="plbl">Member Since</div>
+                    <div class="sub">Dec 14, 2019</div>
+                    <span class="grow"></span>
+                    <span class="gb wide">View Full Profile</span>
+                  </aside>
+                </div>
+              </main>
+            </div>
+            <div class="upanel">
+              <div class="av" style="background:#5865a0">Y<span class="st" data-st="online"></span></div>
+              <div class="grow"><div class="nm">you</div><div class="sub">Online</div></div>
+              <svg class="ic"><use href="#i-mic"/></svg><svg class="ic"><use href="#i-head"/></svg><svg class="ic"><use href="#i-gear"/></svg>
+            </div>
           </div>
           <div class="pv-menu" id="menu" aria-hidden="true">
-            <div class="mi">Mark as read</div>
-            <div class="mi">Mute channel</div>
-            <div class="mi">Notification settings</div>
+            <div class="mi">Mark As Read</div>
             <div class="msep"></div>
-            <div class="mi">Copy link</div>
-            <div class="mi danger">Delete channel</div>
+            <div class="mi">Invite to Server</div>
+            <div class="mi">Mute Channel<svg class="ic sm r"><use href="#i-chev"/></svg></div>
+            <div class="mi">Notification Settings<svg class="ic sm r"><use href="#i-chev"/></svg></div>
+            <div class="msep"></div>
+            <div class="mi">Edit Channel</div>
+            <div class="mi">Copy Link</div>
+            <div class="mi danger">Delete Channel</div>
           </div>
           <div class="pv-wrap" aria-hidden="true">
             <div class="pv-modal">

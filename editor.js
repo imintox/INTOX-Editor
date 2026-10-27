@@ -112,9 +112,10 @@ const freshRoot = () => { const o = {}; allItems().forEach(i => { if (i.k && !i.
 const freshF = () => { const o = {}; allItems().forEach(i => { if (i.fk) o[i.fk] = i.d; }); return o; };
 const freshThemes = () => ({ ash: { ...THEMES.ash.d }, dark: { ...THEMES.dark.d }, onyx: { ...THEMES.onyx.d } });
 const RATIOS = ['16/9', '21/9', '16/10', '4/3', '1/1'];
-const SCENES = ['menu', 'chat', 'window'];
+const SCENES = ['none', 'menu', 'window'];
+const VIEWS = ['home', 'server', 'dm'];
 const KEY = 'intox-editor-v1';
-let S = { root: freshRoot(), f: freshF(), theme: freshThemes(), cur: 'ash', ratio: '16/9', scene: 'menu' };
+let S = { root: freshRoot(), f: freshF(), theme: freshThemes(), cur: 'ash', ratio: '16/9', scene: 'none', view: 'server' };
 try {
   const saved = JSON.parse(localStorage.getItem(KEY) || 'null');
   if (saved) {
@@ -125,6 +126,7 @@ try {
     if (Object.prototype.hasOwnProperty.call(THEMES, saved.cur)) S.cur = saved.cur;
     if (RATIOS.includes(saved.ratio)) S.ratio = saved.ratio;
     if (SCENES.includes(saved.scene)) S.scene = saved.scene;
+    if (VIEWS.includes(saved.view)) S.view = saved.view;
   }
 } catch (e) { /* storage may be unavailable */ }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignore */ } };
@@ -375,7 +377,7 @@ function syncAll() {
     set(v);
   });
   if (themeSummary) themeSummary.textContent = 'Panels and text: ' + THEMES[S.cur].label;
-  $('#theme').value = S.cur; $('#ratio').value = S.ratio; $('#scene').value = S.scene;
+  $('#theme').value = S.cur; $('#ratio').value = S.ratio; $('#scene').value = S.scene; $('#view').value = S.view;
 }
 
 /* ---------- import ---------- */
@@ -439,6 +441,7 @@ function render() {
   v('--p-code', r['--code-font'] || 'Consolas,"Liberation Mono",Menlo,monospace');
   v('--p-filter', +r['--saturation-factor'] !== 1 ? `saturate(${r['--saturation-factor']})` : 'none');
   $$('.st', fr).forEach(s => { s.style.background = r['--' + s.dataset.st + '-color']; });
+  v('--p-online', r['--online-color']); v('--p-offline', r['--offline-color']);
   $('#pvfill').style.background = r['--background-fill'];
   const bg = $('#pvbg');
   bg.style.backgroundImage = r['--background-image'] || 'none';
@@ -453,7 +456,7 @@ function render() {
   bg.style.filter = parts.length ? parts.join(' ') : 'none';
   const c = parseColor(t['--background-shading']) || { r: 0, g: 0, b: 0, a: 0.9 };
   $('#pvshade').style.background = `rgba(${c.r},${c.g},${c.b},${c.a * (+r['--background-shading-percent'] / 100)})`;
-  fr.className = 'pv scene-' + S.scene;
+  fr.className = `pv view-${S.view} ov-${S.scene}`;
   const out = buildCSS();
   $('#out').value = out;
   $('#count').textContent = lastN ? `(${lastN})` : '';
@@ -462,10 +465,10 @@ function render() {
   w.textContent = lastWarn.length ? 'Left out because the value was not safe to write as CSS: ' + lastWarn.join(', ') + '. Remove any braces, semicolons, comments or unbalanced brackets.' : '';
 }
 function replay() {
-  const m = $('#menu'), w = $('.pv-wrap'), mo = $('.pv-modal');
-  [m, w, mo].forEach(x => { x.style.animation = 'none'; });
-  void m.offsetWidth;
-  [m, w, mo].forEach(x => { x.style.animation = ''; });
+  const els = [$('#menu'), $('.pv-wrap'), $('.pv-modal'), ...$$('.tbar')];
+  els.forEach(x => { x.style.animation = 'none'; });
+  void els[0].offsetWidth;
+  els.forEach(x => { x.style.animation = ''; });
 }
 function fit() {
   const box = $('#stageBody'), fr = $('#frame');
@@ -541,15 +544,16 @@ $('#download').onclick = () => {
   document.body.append(a); a.click(); a.remove(); toast('Downloaded INTOX-custom.css');
 };
 $('#reset').onclick = () => {
-  const cur = S.cur, ratio = S.ratio, scene = S.scene;
+  const cur = S.cur, ratio = S.ratio, scene = S.scene, view = S.view;
   settle();
-  S = { root: freshRoot(), f: freshF(), theme: freshThemes(), cur, ratio, scene };
+  S = { root: freshRoot(), f: freshF(), theme: freshThemes(), cur, ratio, scene, view };
   noteChange(); settle();
   syncAll(); save(); render(); probeImage(); toast('Reset to INTOX defaults');
 };
 $('#theme').onchange = e => { S.cur = e.target.value; syncAll(); save(); render(); };
 $('#ratio').onchange = e => { S.ratio = e.target.value; save(); fit(); };
 $('#scene').onchange = e => { S.scene = e.target.value; save(); render(); replay(); };
+$('#view').onchange = e => { S.view = e.target.value; save(); render(); replay(); };
 const tab = which => {
   const css = which === 'css';
   $('#previewView').hidden = css; $('#cssView').hidden = !css;
