@@ -7,3 +7,4 @@ Open it: https://imintox.github.io/INTOX-Editor/
 Theme: https://github.com/imintox/INTOX-v1
 
 Everything runs in your browser. Settings and saved looks are kept only in your browser; nothing is uploaded.
+If you choose a web font, your browser downloads it from jsDelivr (or the font link you entered) to show it in the preview.

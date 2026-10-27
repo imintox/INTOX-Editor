@@ -128,6 +128,8 @@ const SECTIONS = [
     { k: '--user-modal-size', label: 'Profile window fit', t: 'select', opts: [['cover', 'Cover'], ['contain', 'Contain']], d: 'cover' }
   ] },
   { id: 'extras', title: 'Fonts and home icon', items: [
+    { b: 1, k: '@font-main', label: 'Text font: a Google Fonts name or a font file link', t: 'webfont', d: '', ph: 'Inter, or https://.../font.woff2', list: ['Inter', 'Roboto', 'Poppins', 'Montserrat', 'Nunito', 'Outfit', 'Manrope', 'DM Sans', 'Space Grotesk', 'Lexend', 'Rubik', 'Figtree'] },
+    { k: '@font-code', label: 'Code font: a Google Fonts name or a font file link', t: 'webfont', d: '', ph: 'JetBrains Mono', list: ['JetBrains Mono', 'Fira Code', 'Source Code Pro', 'IBM Plex Mono', 'Roboto Mono', 'Space Mono'] },
     { k: '--main-font', label: 'Main font (leave empty for the theme default)', t: 'text', d: '', ph: '"gg sans", "Segoe UI", sans-serif', list: ['"gg sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif', 'Inter, "Segoe UI", system-ui, sans-serif', '"Segoe UI", system-ui, sans-serif', 'Arial, Helvetica, sans-serif', 'Georgia, serif', 'ui-monospace, Consolas, monospace'] },
     { k: '--code-font', label: 'Code font', t: 'text', d: '', ph: 'Consolas, "Liberation Mono", monospace', list: ['Consolas, "Liberation Mono", Menlo, monospace', '"Cascadia Code", Consolas, monospace', '"JetBrains Mono", Consolas, monospace', 'ui-monospace, monospace'] },
     { k: '--home-icon', label: 'Home button icon (image link, leave empty to keep Discord\'s own icon)', t: 'image', d: '' }
@@ -191,6 +193,47 @@ const normFor = (item, v) => {
   return String(v).replace(/\s+/g, ' ').trim();
 };
 const fmt = (item, v) => item.t === 'range' ? `${+v}${item.unit || ''}` : v;
+
+/* ---------- web fonts ---------- */
+// A web font is either a Google Fonts name, loaded from Fontsource on jsDelivr (a host Vencord already
+// allows), or a direct https link to a font file. Both become @font-face rules, which work anywhere in
+// QuickCSS (an @import would only work at the very top). Values are checked against strict patterns,
+// so nothing else can reach the CSS: no quotes, brackets, spaces or semicolons in links.
+const WEBFONT_SLOTS = {
+  '@font-main': { family: 'INTOX Text', target: '--main-font', fallback: '"gg sans", "Helvetica Neue", Helvetica, Arial, sans-serif' },
+  '@font-code': { family: 'INTOX Code', target: '--code-font', fallback: 'Consolas, "Liberation Mono", Menlo, Courier, monospace' }
+};
+const FONT_WEIGHTS = [400, 500, 600, 700];
+const FONT_FILE = /^https:\/\/[a-z0-9.-]+(?::\d{1,5})?\/[\w.~/%+-]*\.(woff2|woff|ttf|otf)(?:\?[\w.~=&%+-]*)?$/i;
+const FONT_NAME = /^[A-Za-z0-9][A-Za-z0-9 ]{0,59}$/;
+const FONT_FORMAT = { woff2: 'woff2', woff: 'woff', ttf: 'truetype', otf: 'opentype' };
+const FONTSOURCE = 'https://cdn.jsdelivr.net/fontsource/fonts/';
+function parseWebFont(v) {
+  v = String(v == null ? '' : v).trim();
+  if (!v) return null;
+  const f = FONT_FILE.exec(v);
+  if (f) return { kind: 'file', url: v, format: FONT_FORMAT[f[1].toLowerCase()] };
+  const name = v.replace(/\s+/g, ' ');
+  if (FONT_NAME.test(name)) return { kind: 'google', name, id: name.toLowerCase().replace(/ /g, '-') };
+  return { kind: 'bad' };
+}
+function faceRules(wf, family) {
+  const face = (src, weight) => `@font-face { font-family: "${family}"; src: ${src};${weight ? ` font-weight: ${weight};` : ''} font-display: swap; }`;
+  if (wf.kind === 'google') return FONT_WEIGHTS.map(w => face(`url(${FONTSOURCE}${wf.id}@latest/latin-${w}-normal.woff2) format("woff2")`, w));
+  if (wf.kind === 'file') return [face(`url(${wf.url}) format("${wf.format}")`)];
+  return [];
+}
+// The web font set for a font variable (--main-font / --code-font), if any.
+const webFontFor = target => {
+  const e = Object.entries(WEBFONT_SLOTS).find(([, s]) => s.target === target);
+  if (!e) return null;
+  const wf = parseWebFont(S.root[e[0]]);
+  return wf && wf.kind !== 'bad' ? { ...e[1], wf } : null;
+};
+const fontStack = target => {
+  const s = webFontFor(target), own = S.root[target];
+  return s ? `"${s.family}", ${own || s.fallback}` : own;
+};
 const defaultFor = item => item.theme ? THEMES[S.cur].d[item.k] : item.d;
 
 /* ---------- build CSS output ---------- */
@@ -202,11 +245,17 @@ function buildCSS() {
     if (!isSafeValue(v)) { warn.push(k); return null; }
     return `  ${k}: ${v};`;
   };
-  const rootLines = [];
+  const rootLines = [], fontRules = [];
+  Object.entries(WEBFONT_SLOTS).forEach(([k, s]) => {
+    const wf = parseWebFont(S.root[k]);
+    if (!wf || wf.kind === 'bad') return;
+    fontRules.push(`/* ${s.family === 'INTOX Text' ? 'Text' : 'Code'} font: ${wf.kind === 'google' ? `${wf.name} (Google Fonts, from jsDelivr)` : 'from a font file link'} */`, ...faceRules(wf, s.family));
+  });
   SECTIONS.forEach(sec => {
     if (sec.theme) return;
     sec.items.forEach(i => {
-      if (!i.k || i.theme) return;
+      if (!i.k || i.theme || i.k[0] === '@') return;
+      if (webFontFor(i.k)) { const l = emit(i.k, fontStack(i.k)); if (l) rootLines.push(l); return; }
       const v = S.root[i.k];
       if (v === '' || v == null) return;
       if (normFor(i, v) !== normFor(i, i.d)) { const l = emit(i.k, fmt(i, v)); if (l) rootLines.push(l); }
@@ -223,8 +272,9 @@ function buildCSS() {
     const l = emit('--background-filter', parts.join(' ')); if (l) rootLines.push(l);
   }
   const blocks = [];
+  if (fontRules.length) blocks.push(fontRules.join('\n'));
   if (rootLines.length) blocks.push(`:root {\n${rootLines.join('\n')}\n}`);
-  let n = rootLines.length;
+  let n = rootLines.length; // a web font always adds its --main-font / --code-font line, so it counts once
   Object.keys(THEMES).forEach(tk => {
     const lines = [];
     THEME_ITEMS.forEach(i => {
@@ -241,6 +291,7 @@ function buildCSS() {
 /* ---------- controls ---------- */
 let uid = 0;
 const controls = [];
+const fontNotes = {}; // web font fields: report whether the font loaded in the preview
 const acc = item => {
   const o = () => item.theme ? S.theme[S.cur] : item.fk ? S.f : S.root;
   const key = item.k || item.fk;
@@ -367,6 +418,23 @@ function mkControl(item) {
     };
     field = el('div', { class: 'field' }, inp);
     controls.push({ item, set: v => { inp.value = v; } });
+  } else if (item.t === 'webfont') {
+    const inp = el('input', { type: 'text', id, class: 'mono', spellcheck: 'false', autocomplete: 'off', maxlength: '300', placeholder: item.ph || '' });
+    const dl = el('datalist', { id: id + 'l' }, item.list.map(v => el('option', { value: v })));
+    inp.setAttribute('list', id + 'l'); row.append(dl);
+    const st = el('div', { class: 'hint fstat', 'aria-live': 'polite' });
+    const show = (v, loaded) => {
+      const wf = parseWebFont(v);
+      inp.classList.toggle('bad', !!wf && (wf.kind === 'bad' || loaded === false));
+      st.textContent = !wf ? 'Leave empty to keep the font below.'
+        : wf.kind === 'bad' ? 'Type a font name from fonts.google.com (like Inter), or an https link ending in .woff2, .woff, .ttf or .otf.'
+        : loaded === false ? (wf.kind === 'google' ? `Couldn't find "${wf.name}". Check the spelling on fonts.google.com.` : 'Couldn\'t load that font file. Check the link.')
+        : wf.kind === 'google' ? `Google font "${wf.name}"${loaded ? ', loaded' : ''}.` : `Font file${loaded ? ', loaded' : ''}.`;
+    };
+    fontNotes[item.k] = loaded => show(inp.value, loaded);
+    inp.oninput = () => { a.set(inp.value.trim()); show(inp.value); changed(item); };
+    field = el('div', { class: 'field stack' }, inp, st);
+    controls.push({ item, set: v => { inp.value = v; show(v); } });
   } else {
     const inp = el('input', { type: 'text', id, class: 'mono', spellcheck: 'false', placeholder: item.ph || '' });
     if (item.list) {
@@ -422,6 +490,9 @@ function buildPanel() {
     if (sec.id === 'servers') {
       body.append(el('div', { class: 'hint b' }, 'Home and the add and discover buttons stay centered above the columns. Experimental: if Discord changes its server list, set this back to 1.'));
     }
+    if (sec.id === 'extras') {
+      body.prepend(el('div', { class: 'hint b' }, 'Use any font from fonts.google.com by its name, or a link to a font file. Google fonts cover Latin letters; other scripts use the fallback font. If Vencord lists a font under Blocked Resources, press Allow there and restart Discord.'));
+    }
     if (sec.id === 'clean') {
       body.prepend(el('div', { class: 'hint b' }, 'These only hide things. Turn a switch off to bring it back.'));
     }
@@ -470,12 +541,32 @@ function splitDecls(body) {
 }
 function importCSS(css) {
   settle();
+  // The editor's own comments keep a Google font's exact spelling (e.g. "JetBrains Mono").
+  const fontNames = {};
+  for (const c of css.matchAll(/\/\* (Text|Code) font: ([A-Za-z0-9 ]{1,60}) \(Google Fonts/g)) fontNames[c[2].toLowerCase().replace(/ /g, '-')] = c[2];
   css = css.replace(/\/\*[\s\S]*?\*\//g, '');
   const items = {}; allItems().forEach(i => { if (i.k) items[i.k] = i; });
   THEME_ITEMS.forEach(i => { items[i.k] = i; });
   let n = 0, m; const re = /([^{}]+)\{([^{}]*)\}/g;
+  const fontsSeen = new Set();
   while ((m = re.exec(css))) {
     const sel = m[1];
+    // Web fonts written by the editor: @font-face rules for "INTOX Text" / "INTOX Code".
+    if (/@font-face\s*$/i.test(sel)) {
+      let fam = '', src = '';
+      for (const piece of splitDecls(m[2])) {
+        const d = /^\s*(font-family|src)\s*:\s*([\s\S]+?)\s*$/i.exec(piece);
+        if (d) { if (d[1].toLowerCase() === 'font-family') fam = d[2].replace(/^["']|["']$/g, ''); else src = d[2]; }
+      }
+      const key = Object.keys(WEBFONT_SLOTS).find(k => WEBFONT_SLOTS[k].family === fam);
+      const u = /url\(\s*["']?([^"')\s]+)["']?\s*\)/i.exec(src);
+      if (!key || !u || fontsSeen.has(key)) continue;
+      const fsrc = /^https:\/\/cdn\.jsdelivr\.net\/fontsource\/fonts\/([a-z0-9-]+)(?::vf)?@/.exec(u[1]);
+      const val = fsrc ? (fontNames[fsrc[1]] || fsrc[1].split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')) : u[1];
+      const wf = parseWebFont(val);
+      if (wf && wf.kind !== 'bad') { S.root[key] = val; fontsSeen.add(key); n++; }
+      continue;
+    }
     const tk = /theme-midnight/.test(sel) ? 'onyx' : /theme-darker/.test(sel) ? 'dark' : /theme-dark/.test(sel) ? 'ash' : null;
     for (const piece of splitDecls(m[2])) {
       const d = /^\s*(--[\w-]+)\s*:\s*([\s\S]+?)\s*$/.exec(piece);
@@ -488,6 +579,12 @@ function importCSS(css) {
         n++; continue;
       }
       if (!it) continue;
+      // A font line written with a web font starts with its family name; keep only the user's own fonts.
+      const slot = Object.values(WEBFONT_SLOTS).find(s => s.target === k);
+      if (slot) {
+        const fam = new RegExp(`^\\s*["']${slot.family}["']\\s*,\\s*`);
+        if (fam.test(v)) { const rest = v.replace(fam, '').trim(); S.root[k] = rest === slot.fallback ? '' : rest; n++; continue; }
+      }
       const cv = it.t === 'rgba' ? (parseColor(v) ? toRgba(parseColor(v)) : v) : v;
       if (it.theme) { (tk ? [tk] : Object.keys(S.theme)).forEach(t => { S.theme[t][k] = cv; }); n++; }
       else if (it.t === 'range') { const x = parseFloat(v); if (!isNaN(x)) { S.root[k] = x; n++; } }
@@ -512,8 +609,9 @@ function render() {
   v('--p-sel', r['--channel-selected-bg']); v('--p-unread', r['--channel-unread']);
   v('--p-speed', r['--intox-speed'] + 'ms'); v('--p-ease', r['--intox-ease']); v('--p-radius', r['--intox-radius'] + 'px');
   v('--p-blur', r['--intox-blur'] + 'px'); v('--p-border', r['--intox-border']);
-  v('--p-font', r['--main-font'] || '"gg sans","Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif');
-  v('--p-code', r['--code-font'] || 'Consolas,"Liberation Mono",Menlo,monospace');
+  v('--p-font', fontStack('--main-font') || '"gg sans","Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif');
+  v('--p-code', fontStack('--code-font') || 'Consolas,"Liberation Mono",Menlo,monospace');
+  previewFonts();
   v('--p-filter', +r['--saturation-factor'] !== 1 ? `saturate(${r['--saturation-factor']})` : 'none');
   $$('.st', fr).forEach(s => { s.style.background = r['--' + s.dataset.st + '-color']; });
   v('--p-online', r['--online-color']); v('--p-offline', r['--offline-color']);
@@ -545,6 +643,26 @@ function render() {
   const w = $('#warn');
   w.hidden = !lastWarn.length;
   w.textContent = lastWarn.length ? 'Left out because the value was not safe to write as CSS: ' + lastWarn.join(', ') + '. Remove any braces, semicolons, comments or unbalanced brackets.' : '';
+}
+// Load web fonts into the preview. Waits until typing pauses, so half-typed names aren't fetched.
+let fontT;
+function previewFonts() {
+  clearTimeout(fontT);
+  fontT = setTimeout(() => {
+    const rules = [], active = [];
+    Object.entries(WEBFONT_SLOTS).forEach(([k, s]) => {
+      const wf = parseWebFont(S.root[k]);
+      if (!wf || wf.kind === 'bad') return;
+      rules.push(...faceRules(wf, s.family)); active.push([k, s, S.root[k]]);
+    });
+    const css = rules.join('\n'), tag = $('#pvfonts');
+    if (tag.textContent === css) return;
+    tag.textContent = css;
+    active.forEach(([k, s, val]) => {
+      const report = ok => { if (S.root[k] === val && fontNotes[k]) fontNotes[k](ok); };
+      document.fonts.load(`400 16px "${s.family}"`).then(f => report(f.length > 0), () => report(false));
+    });
+  }, 600);
 }
 function replay() {
   const els = [$('#menu'), $('.pv-settings'), ...$$('.tbar'), ...$$('#frame .msg')];
