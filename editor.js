@@ -59,27 +59,28 @@ const BG_ANIMS = [['none', 'None'], ['intox-drift', 'Slow drift'], ['intox-breat
 const FEATURES = ['hover-servers', 'hover-channels', 'hover-avatars', 'hide-nitro', 'hide-shop', 'hide-quests', 'hide-active-now', 'no-glow', 'vignette', 'selection'];
 const SECTIONS = [
   { id: 'accent', title: 'Accent colors', open: true, items: [
-    { k: '--main-color', label: 'Main color', t: 'color', d: '#4a6cf7' },
+    { b: 1, k: '--main-color', label: 'Main color', t: 'color', d: '#4a6cf7' },
     { k: '--hover-color', label: 'Hover color', t: 'color', d: '#3a56d4' },
     { k: '--success-color', label: 'Success color', t: 'color', d: '#43b581' },
     { k: '--danger-color', label: 'Danger color', t: 'color', d: '#982929' },
     { k: '--saturation-factor', label: 'Color saturation (everything)', t: 'range', min: 0, max: 2, step: 0.05, unit: '', d: 1 }
   ] },
   { id: 'bg', title: 'App background', open: true, items: [
-    { k: '--background-image', label: 'Image link or gradient', t: 'image', d: 'url(https://files.catbox.moe/9pvwts.png)' },
-    { k: '--background-size', label: 'Fit', t: 'select', opts: FIT, d: 'contain' },
+    { b: 1, k: '--background-image', label: 'Image link or gradient', t: 'image', d: 'url(https://files.catbox.moe/9pvwts.png)' },
+    { b: 1, k: '--background-shading', theme: 1, t: 'alpha', label: 'Background darkness' },
+    { b: 1, k: '--background-size', label: 'Fit', t: 'select', opts: FIT, d: 'contain' },
     { k: '--background-position', label: 'Position', t: 'select', opts: POS, d: 'center' },
     { k: '--background-attachment', label: 'Attachment', t: 'select', opts: [['fixed', 'Fixed (stays put)'], ['scroll', 'Scroll']], d: 'fixed' },
-    { k: '--background-fill', label: 'Fill color (shown where the image does not reach)', t: 'color', d: '#000000' },
+    { b: 1, k: '--background-fill', label: 'Fill color (shown where the image does not reach)', t: 'color', d: '#000000' },
     { k: '--background-shading-percent', label: 'Shading amount', t: 'range', min: 0, max: 100, step: 1, unit: '%', d: 100 },
-    { fk: 'blur', label: 'Image blur', t: 'range', min: 0, max: 20, step: 0.5, unit: 'px', d: 0 },
+    { b: 1, fk: 'blur', label: 'Image blur', t: 'range', min: 0, max: 20, step: 0.5, unit: 'px', d: 0 },
     { fk: 'bright', label: 'Image brightness', t: 'range', min: 20, max: 200, step: 1, unit: '%', d: 100 },
     { fk: 'sat', label: 'Image saturation', t: 'range', min: 0, max: 200, step: 1, unit: '%', d: 100 },
     { fk: 'contrast', label: 'Image contrast', t: 'range', min: 50, max: 200, step: 1, unit: '%', d: 100 }
   ] },
   { id: 'panels', theme: true, items: THEME_ITEMS },
   { id: 'servers', title: 'Server list', items: [
-    { k: '--intox-server-columns', label: 'Server columns (experimental)', t: 'select', opts: [['1', '1 (normal)'], ['2', '2 columns'], ['3', '3 columns'], ['4', '4 columns']], d: '1', strict: 1 }
+    { b: 1, k: '--intox-server-columns', label: 'Server columns (experimental)', t: 'select', opts: [['1', '1 (normal)'], ['2', '2 columns'], ['3', '3 columns'], ['4', '4 columns']], d: '1', strict: 1 }
   ] },
   { id: 'channels', title: 'Channel colors', items: [
     { k: '--channel-selected-bg', label: 'Selected channel background', t: 'rgba', d: 'rgba(255, 255, 255, 0.08)' },
@@ -87,34 +88,34 @@ const SECTIONS = [
     { k: '--channel-unread-hover', label: 'Unread channel hover text', t: 'color', d: '#ffffff' }
   ] },
   { id: 'motion', title: 'Motion and look', items: [
-    { k: '--intox-speed', label: 'Animation speed (0 turns animations off)', t: 'range', min: 0, max: 500, step: 10, unit: 'ms', d: 160 },
+    { b: 1, k: '--intox-speed', label: 'Animation speed (0 turns animations off)', t: 'range', min: 0, max: 500, step: 10, unit: 'ms', d: 160 },
     { k: '--intox-ease', label: 'Animation feel', t: 'select', opts: EASE, d: 'cubic-bezier(0.2, 0, 0, 1)' },
-    { k: '--intox-radius', label: 'Roundness of menus and windows', t: 'range', min: 0, max: 28, step: 1, unit: 'px', d: 12 },
-    { k: '--intox-blur', label: 'Glass blur behind menus and windows', t: 'range', min: 0, max: 40, step: 1, unit: 'px', d: 14 },
+    { b: 1, k: '--intox-radius', label: 'Roundness of menus and windows', t: 'range', min: 0, max: 28, step: 1, unit: 'px', d: 12 },
+    { b: 1, k: '--intox-blur', label: 'Glass blur behind menus and windows', t: 'range', min: 0, max: 40, step: 1, unit: 'px', d: 14 },
     { k: '--intox-border', label: 'Menu and window outline', t: 'rgba', d: 'rgba(255, 255, 255, 0.07)' },
     { k: '--intox-scroll', label: 'Scrollbar color', t: 'rgba', d: 'rgba(255, 255, 255, 0.16)' }
   ] },
   { id: 'anim', title: 'Animations', items: [
-    { k: '--intox-menu-anim', label: 'Menus', t: 'select', opts: ANIMS, d: 'intox-rise', strict: 1 },
+    { b: 1, k: '--intox-menu-anim', label: 'Menus', t: 'select', opts: ANIMS, d: 'intox-rise', strict: 1 },
     { k: '--intox-toolbar-anim', label: 'Message hover toolbar', t: 'select', opts: ANIMS, d: 'intox-fade', strict: 1 },
-    { k: '--intox-window-anim', label: 'Windows and settings', t: 'select', opts: ANIMS, d: 'none', strict: 1 },
-    { k: '--intox-message-anim', label: 'New messages', t: 'select', opts: ANIMS, d: 'none', strict: 1 },
-    { k: '--intox-bg-anim', label: 'Background motion', t: 'select', opts: BG_ANIMS, d: 'none', strict: 1 },
+    { b: 1, k: '--intox-window-anim', label: 'Windows and settings', t: 'select', opts: ANIMS, d: 'none', strict: 1 },
+    { b: 1, k: '--intox-message-anim', label: 'New messages', t: 'select', opts: ANIMS, d: 'none', strict: 1 },
+    { b: 1, k: '--intox-bg-anim', label: 'Background motion', t: 'select', opts: BG_ANIMS, d: 'none', strict: 1 },
     { k: '--intox-bg-speed', label: 'Background motion speed (seconds per loop)', t: 'range', min: 10, max: 120, step: 5, unit: 's', d: 40 },
-    { k: '--intox-hover-servers', label: 'Server icons grow on hover', t: 'toggle', d: '' },
-    { k: '--intox-hover-channels', label: 'Channel names slide on hover', t: 'toggle', d: '' },
-    { k: '--intox-hover-avatars', label: 'Chat avatars grow on hover', t: 'toggle', d: '' }
+    { b: 1, k: '--intox-hover-servers', label: 'Server icons grow on hover', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-hover-channels', label: 'Channel names slide on hover', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-hover-avatars', label: 'Chat avatars grow on hover', t: 'toggle', d: '' }
   ] },
   { id: 'clean', title: 'Clean up', items: [
-    { k: '--intox-hide-nitro', label: 'Hide the Nitro link', t: 'toggle', d: '' },
-    { k: '--intox-hide-shop', label: 'Hide the Shop link', t: 'toggle', d: '' },
-    { k: '--intox-hide-quests', label: 'Hide Quests and the quest banner', t: 'toggle', d: '' },
-    { k: '--intox-hide-active-now', label: 'Hide the Active Now column', t: 'toggle', d: '' },
-    { k: '--intox-no-glow', label: 'Remove glows on unread items', t: 'toggle', d: '' }
+    { b: 1, k: '--intox-hide-nitro', label: 'Hide the Nitro link', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-hide-shop', label: 'Hide the Shop link', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-hide-quests', label: 'Hide Quests and the quest banner', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-hide-active-now', label: 'Hide the Active Now column', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-no-glow', label: 'Remove glows on unread items', t: 'toggle', d: '' }
   ] },
   { id: 'extras2', title: 'Extras', items: [
-    { k: '--intox-vignette', label: 'Darker background edges (vignette)', t: 'toggle', d: '' },
-    { k: '--intox-selection', label: 'Accent-colored text selection', t: 'toggle', d: '' }
+    { b: 1, k: '--intox-vignette', label: 'Darker background edges (vignette)', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-selection', label: 'Accent-colored text selection', t: 'toggle', d: '' }
   ] },
   { id: 'status', title: 'Status colors', items: [
     { k: '--online-color', label: 'Online', t: 'color', d: '#43b581' },
@@ -157,6 +158,9 @@ try {
     if (VIEWS.includes(saved.view)) S.view = saved.view;
   }
 } catch (e) { /* storage may be unavailable */ }
+const MODE_KEY = 'intox-editor-mode';
+let MODE = 'basic';
+try { const m = localStorage.getItem(MODE_KEY); if (m === 'basic' || m === 'advanced') MODE = m; } catch (e) { /* storage unavailable */ }
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { /* ignore */ } };
 
 /* ---------- value helpers ---------- */
@@ -203,7 +207,7 @@ function buildCSS() {
   SECTIONS.forEach(sec => {
     if (sec.theme) return;
     sec.items.forEach(i => {
-      if (!i.k) return;
+      if (!i.k || i.theme) return;
       const v = S.root[i.k];
       if (v === '' || v == null) return;
       if (normFor(i, v) !== normFor(i, i.d)) { const l = emit(i.k, fmt(i, v)); if (l) rootLines.push(l); }
@@ -243,7 +247,12 @@ const acc = item => {
   const key = item.k || item.fk;
   return { get: () => o()[key], set: v => { o()[key] = v; } };
 };
+const darker = hex => { const c = parseColor(hex); if (!c) return null; return toHex({ r: Math.round(c.r * 0.8), g: Math.round(c.g * 0.8), b: Math.round(c.b * 0.8) }); };
 const changed = item => {
+  if (MODE === 'basic' && item && item.k === '--main-color') {
+    const h = darker(S.root['--main-color']);
+    if (h) { S.root['--hover-color'] = h; controls.filter(c => c.item.k === '--hover-color').forEach(c => c.set(h)); }
+  }
   noteChange();
   if (!item) settle(); // button actions (presets, copy to all...) are always their own step
   save(); render();
@@ -289,7 +298,7 @@ function redo() { settle(); if (!future.length) return; past.push(snap()); resto
 
 function mkControl(item) {
   const id = 'c' + (uid++), a = acc(item);
-  const row = el('div', { class: 'row' }, el('label', { for: id }, item.label));
+  const row = el('div', { class: 'row' + (item.b ? ' b' : '') }, el('label', { for: id }, item.label));
   let field;
   if (item.t === 'color') {
     const pick = el('input', { type: 'color', id });
@@ -327,10 +336,20 @@ function mkControl(item) {
     r.oninput = () => { const n = parseFloat(r.value); a.set(n); show(n); changed(item); };
     field = el('div', { class: 'field' }, r, out);
     controls.push({ item, set: v => { r.value = v; show(v); } });
+  } else if (item.t === 'alpha') {
+    const r = el('input', { type: 'range', id, min: 0, max: 100, step: 1 });
+    const out = el('span', { class: 'val mono' });
+    r.oninput = () => {
+      const c = parseColor(a.get()) || { r: 0, g: 0, b: 0, a: 1 };
+      c.a = +r.value / 100; out.textContent = r.value + '%';
+      a.set(toRgba(c)); changed(item);
+    };
+    field = el('div', { class: 'field' }, r, out);
+    controls.push({ item, set: v => { const c = parseColor(v) || { a: 1 }; r.value = Math.round(c.a * 100); out.textContent = r.value + '%'; } });
   } else if (item.t === 'toggle') {
     const cb = el('input', { type: 'checkbox', id, class: 'tgl', role: 'switch' });
     cb.onchange = () => { a.set(cb.checked ? 'on' : ''); changed(item); };
-    row.className = 'row tg';
+    row.className = 'row tg' + (item.b ? ' b' : '');
     field = cb;
     controls.push({ item, set: v => { cb.checked = v === 'on'; } });
   } else if (item.t === 'select') {
@@ -368,10 +387,14 @@ function buildPanel() {
   const p = $('#panel'); p.textContent = '';
   const q = el('input', { type: 'search', placeholder: 'Search settings', 'aria-label': 'Search settings', spellcheck: 'false' });
   q.oninput = () => filterPanel(q.value);
-  p.append(el('div', { class: 'psearch' }, q));
+  const mb = el('button', { type: 'button', 'data-mode': 'basic' }, 'Basic');
+  const ma = el('button', { type: 'button', 'data-mode': 'advanced' }, 'Advanced');
+  [mb, ma].forEach(btn => { btn.onclick = () => setMode(btn.dataset.mode); });
+  p.append(el('div', { class: 'psearch' }, el('div', { class: 'modes', role: 'group', 'aria-label': 'Settings mode' }, mb, ma), q));
+  p.append(el('div', { class: 'intro b' }, el('b', {}, 'Make it yours.'), ' Pick a color, a background and a few touches. Switch to Advanced for every setting.'));
   SECTIONS.forEach(sec => {
     const sum = el('summary', {}, sec.theme ? '' : sec.title);
-    const d = el('details', { class: 'sec' }, sum);
+    const d = el('details', { class: 'sec' + (sec.items.some(i => i.b) ? ' b' : '') }, sum);
     if (sec.open || sec.theme) d.open = true;
     const body = el('div', { class: 'body' });
     sec.items.forEach(i => body.append(mkControl(i)));
@@ -379,7 +402,7 @@ function buildPanel() {
       const chips = el('div', { class: 'chips' }, ACCENTS.map(([n, m, h]) =>
         el('button', { class: 'chip', type: 'button' }, el('span', { class: 'dot', style: `background:${m}` }), n)));
       $$('button', chips).forEach((b, i) => { b.onclick = () => { S.root['--main-color'] = ACCENTS[i][1]; S.root['--hover-color'] = ACCENTS[i][2]; syncAll(); changed(); }; });
-      body.prepend(el('div', { class: 'row' }, el('label', {}, 'Quick accents'), chips));
+      body.prepend(el('div', { class: 'row b swatches' }, el('label', {}, 'Quick accents'), chips));
     }
     if (sec.id === 'bg') {
       const info = el('div', { class: 'hint', id: 'imgInfo' });
@@ -390,18 +413,18 @@ function buildPanel() {
         mk('Fit whole image', () => { S.root['--background-size'] = 'contain'; S.root['--background-position'] = 'center'; }),
         mk('Fill window', () => { S.root['--background-size'] = 'cover'; S.root['--background-position'] = 'center'; }),
         mk('No image (pure black)', () => { S.root['--background-image'] = 'none'; S.root['--background-fill'] = '#000000'; }));
-      body.insertBefore(el('div', { class: 'row' }, info, fill, chips), body.children[1]);
+      body.insertBefore(el('div', { class: 'row b' }, info, fill, chips), body.children[1]);
     }
     if (sec.id === 'anim') {
-      const play = el('button', { class: 'btn small', type: 'button' }, 'Play animations in the preview');
+      const play = el('button', { class: 'btn small b', type: 'button' }, 'Play animations in the preview');
       play.onclick = () => { if (S.scene === 'none' && S.root['--intox-menu-anim'] !== 'none') setOverlay('menu'); replay(); };
-      body.prepend(el('div', { class: 'hint' }, 'Animations always stay off when your system asks to reduce motion.'), play);
+      body.prepend(el('div', { class: 'hint b' }, 'Animations always stay off when your system asks to reduce motion.'), play);
     }
     if (sec.id === 'servers') {
-      body.append(el('div', { class: 'hint' }, 'Home and the add and discover buttons stay centered above the columns. Experimental: if Discord changes its server list, set this back to 1.'));
+      body.append(el('div', { class: 'hint b' }, 'Home and the add and discover buttons stay centered above the columns. Experimental: if Discord changes its server list, set this back to 1.'));
     }
     if (sec.id === 'clean') {
-      body.prepend(el('div', { class: 'hint' }, 'These only hide things. Turn a switch off to bring it back.'));
+      body.prepend(el('div', { class: 'hint b' }, 'These only hide things. Turn a switch off to bring it back.'));
     }
     if (sec.theme) {
       themeSummary = sum;
@@ -417,7 +440,9 @@ function buildPanel() {
   go.onclick = () => { const n = importCSS(ta.value); toast(n ? `Loaded ${n} value${n === 1 ? '' : 's'}` : 'Nothing recognized'); };
   p.append(el('details', { class: 'sec' }, el('summary', {}, 'Import existing CSS'), el('div', { class: 'body' }, el('div', { class: 'hint' }, 'Paste CSS you already use and the editor will read the INTOX settings from it.'), ta, go)));
   p.append(buildLooks());
-  p.append(el('div', { class: 'note' }, 'Only values you change are written to the CSS output. INTOX 1.1.0'));
+  p.append(el('div', { class: 'note b more' }, 'Showing the essentials. ', el('button', { type: 'button', class: 'linkbtn', 'data-mode': 'advanced' }, 'Show all settings')));
+  $$('.linkbtn', p).forEach(btn => { btn.onclick = () => setMode('advanced'); });
+  p.append(el('div', { class: 'note b' }, 'Only values you change are written to the CSS output. INTOX 1.1.0'));
 }
 
 function syncAll() {
@@ -540,13 +565,25 @@ function fit() {
   fr.style.width = Math.floor(w) + 'px'; fr.style.height = Math.floor(h) + 'px';
 }
 
+/* ---------- basic / advanced ---------- */
+function setMode(m) {
+  if (m !== 'basic' && m !== 'advanced') return;
+  MODE = m;
+  try { localStorage.setItem(MODE_KEY, m); } catch (e) { /* storage unavailable */ }
+  const p = $('#panel');
+  p.classList.toggle('mode-basic', m === 'basic');
+  $$('.modes button', p).forEach(btn => btn.setAttribute('aria-pressed', String(btn.dataset.mode === m)));
+  const q = $('.psearch input', p); filterPanel(q ? q.value : '');
+}
+
 /* ---------- settings search ---------- */
 function filterPanel(text) {
   const q = text.trim().toLowerCase();
   $$('#panel details.sec').forEach(d => {
     if (d.dataset.wasOpen === undefined) d.dataset.wasOpen = d.open ? '1' : '';
     const title = (d.querySelector('summary') || {}).textContent || '';
-    const rows = $$('.body > .row', d);
+    const basic = $('#panel').classList.contains('mode-basic');
+    const rows = $$('.body > .row', d).filter(r => !basic || r.classList.contains('b'));
     let any = !q || title.toLowerCase().includes(q);
     rows.forEach(r => {
       const hit = !q || title.toLowerCase().includes(q) || r.textContent.toLowerCase().includes(q);
@@ -615,8 +652,8 @@ function buildLooks() {
     name.value = ''; draw();
   };
   draw();
-  return el('details', { class: 'sec' }, el('summary', {}, 'Saved looks'),
-    el('div', { class: 'body' }, el('div', { class: 'hint' }, 'Looks are kept only in this browser.'), el('div', { class: 'line' }, name, saveBtn), list));
+  return el('details', { class: 'sec b' }, el('summary', {}, 'Saved looks'),
+    el('div', { class: 'body' }, el('div', { class: 'hint b' }, 'Looks are kept only in this browser.'), el('div', { class: 'line b' }, name, saveBtn), el('div', { class: 'b' }, list)));
 }
 
 /* ---------- clickable preview ---------- */
@@ -794,7 +831,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ---------- start ---------- */
-buildPanel(); syncAll(); render(); probeImage();
+buildPanel(); setMode(MODE); syncAll(); render(); probeImage();
 committed = snap(); updateHistoryButtons();
 new ResizeObserver(fit).observe($('#stageBody'));
 window.addEventListener('resize', fit);
