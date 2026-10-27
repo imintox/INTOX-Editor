@@ -842,6 +842,9 @@ document.addEventListener('keydown', e => {
 });
 
 /* ---------- start ---------- */
+// Every message gets the hover toolbar, cloned from the one in the page (no HTML strings involved).
+const tbarTemplate = $('#frame .tbar');
+if (tbarTemplate) $$('#frame .msg').forEach(m => { if (!m.querySelector(':scope > .tbar')) m.append(tbarTemplate.cloneNode(true)); });
 buildPanel(); setMode(MODE); syncAll(); render(); probeImage();
 committed = snap(); updateHistoryButtons();
 new ResizeObserver(fit).observe($('#stageBody'));

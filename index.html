@@ -209,7 +209,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 .div{display:flex;align-items:center;gap:.6em;margin:.8em 1em;font-size:.72em;font-weight:600;color:var(--p-muted)}
 .div::before,.div::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.08)}
 .msg{position:relative;flex:none;display:flex;gap:1em;padding:.3em 1em;transition:background var(--p-speed) var(--p-ease)}
-.msg:hover,.msg.hov{background:rgba(255,255,255,.025)}
+.msg:hover{background:rgba(255,255,255,.025)}
 .msg>.av{width:2.5em;height:2.5em}
 .mb{min-width:0}
 .mh{display:flex;align-items:baseline;gap:.4em}
@@ -250,7 +250,8 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
 .sys>.ic{color:var(--p-success)}
 .sys b{color:var(--p-text)}
 .sys time{font-size:.8em}
-.tbar{position:absolute;right:1em;top:-1em;display:flex;align-items:center;gap:.55em;padding:.3em .55em;border-radius:.5em;background:var(--p-popout);border:1px solid var(--p-border);color:var(--p-muted);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));animation-name:var(--p-toolbar-anim,intox-fade);animation-duration:var(--p-speed);animation-timing-function:var(--p-ease);animation-fill-mode:both;font-size:.95em}
+.tbar{position:absolute;right:1em;top:-1em;z-index:2;display:none;align-items:center;gap:.55em;padding:.3em .55em;border-radius:.5em;background:var(--p-popout);border:1px solid var(--p-border);color:var(--p-muted);backdrop-filter:blur(var(--p-blur));-webkit-backdrop-filter:blur(var(--p-blur));animation-name:var(--p-toolbar-anim,intox-fade);animation-duration:var(--p-speed);animation-timing-function:var(--p-ease);animation-fill-mode:both;font-size:.95em}
+.msg:hover>.tbar{display:flex}
 .tbar i{width:1px;height:1em;background:rgba(255,255,255,.12)}
 .invite{margin-top:.4em;width:15em;border-radius:.5em;overflow:hidden;background:var(--p-card);border:1px solid rgba(255,255,255,.06)}
 .ib{height:3.2em;background:linear-gradient(135deg,#7a1f2b,#2a0d12)}
@@ -611,7 +612,7 @@ textarea.imp{height:120px;font-family:var(--mono);font-size:12px;resize:vertical
                       </div>
                       <div class="div"><span>October 11, 2026</span></div>
                       <div class="sys"><svg class="ic"><use href="#i-adduser"/></svg><span>You accepted <b data-p="name">Kit</b>'s friend request.</span><time>10/11/26</time></div>
-                      <div class="msg hov"><div class="av" style="background:#5865a0">Y</div><div class="mb">
+                      <div class="msg"><div class="av" style="background:#5865a0">Y</div><div class="mb">
                         <div class="mh"><b>you</b><time>10/11/26, 2:21 PM</time></div>
                         <div>just set up the new theme</div>
                       </div>
