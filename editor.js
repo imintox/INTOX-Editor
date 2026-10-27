@@ -56,7 +56,7 @@ THEME_ITEMS.forEach(i => { i.d = null; });
 
 const ANIMS = [['intox-rise', 'Rise'], ['intox-fade', 'Fade'], ['intox-pop', 'Pop'], ['intox-slide', 'Slide in'], ['intox-drop', 'Drop down'], ['none', 'None']];
 const BG_ANIMS = [['none', 'None'], ['intox-drift', 'Slow drift'], ['intox-breathe', 'Breathe']];
-const FEATURES = ['hover-servers', 'hover-channels', 'hover-avatars', 'hide-nitro', 'hide-shop', 'hide-quests', 'hide-active-now', 'no-glow', 'vignette', 'selection'];
+const FEATURES = ['hover-servers', 'hover-channels', 'hover-avatars', 'hide-nitro', 'hide-shop', 'hide-quests', 'hide-active-now', 'hide-requests', 'hide-family', 'hide-add-server', 'hide-discover', 'hide-download', 'hide-help', 'hide-gift', 'no-glow', 'vignette', 'selection'];
 const SECTIONS = [
   { id: 'accent', title: 'Accent colors', open: true, items: [
     { b: 1, k: '--main-color', label: 'Main color', t: 'color', d: '#4a6cf7' },
@@ -111,6 +111,13 @@ const SECTIONS = [
     { b: 1, k: '--intox-hide-shop', label: 'Hide the Shop link', t: 'toggle', d: '' },
     { b: 1, k: '--intox-hide-quests', label: 'Hide Quests and the quest banner', t: 'toggle', d: '' },
     { b: 1, k: '--intox-hide-active-now', label: 'Hide the Active Now column', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-hide-requests', label: 'Hide the Message Requests link', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-hide-family', label: 'Hide the Family Center link', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-hide-add-server', label: 'Hide the Add a Server button', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-hide-discover', label: 'Hide the Discover button', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-hide-download', label: 'Hide the Download Apps button', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-hide-help', label: 'Hide the Help button', t: 'toggle', d: '' },
+    { b: 1, k: '--intox-hide-gift', label: 'Hide the gift button (English Discord only)', t: 'toggle', d: '' },
     { b: 1, k: '--intox-no-glow', label: 'Remove glows on unread items', t: 'toggle', d: '' }
   ] },
   { id: 'extras2', title: 'Extras', items: [
@@ -442,7 +449,7 @@ function buildPanel() {
   p.append(buildLooks());
   p.append(el('div', { class: 'note b more' }, 'Showing the essentials. ', el('button', { type: 'button', class: 'linkbtn', 'data-mode': 'advanced' }, 'Show all settings')));
   $$('.linkbtn', p).forEach(btn => { btn.onclick = () => setMode('advanced'); });
-  p.append(el('div', { class: 'note b' }, 'Only values you change are written to the CSS output. INTOX 1.1.1'));
+  p.append(el('div', { class: 'note b' }, 'Only values you change are written to the CSS output. Made for INTOX 1.1.7'));
 }
 
 function syncAll() {
